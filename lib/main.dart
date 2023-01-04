@@ -17,8 +17,8 @@ import 'package:flutter_application_1/presentation/pages/login.dart';
 import 'package:flutter_application_1/presentation/pages/my_page.dart';
 import 'package:flutter_application_1/presentation/pages/regis.dart';
 import 'package:flutter_application_1/presentation/pages/tmbh_Kasbon.dart';
-//import 'package:flutter_application_1/presentation/pages/login.dart';
-//import 'package:flutter_application_1/presentation/pages/tmpl_brhsil.dart';
+import 'package:flutter_application_1/presentation/pages/login.dart';
+import 'package:flutter_application_1/presentation/pages/tmpl_brhsil.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
