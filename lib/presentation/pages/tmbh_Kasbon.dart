@@ -76,8 +76,8 @@ class _TambhKasbonState extends State<TambhKasbon> {
         "status": "0",
         "month": DateFormat("MMMM").format(DateTime.now()),
         "tipe_pengajuan": 'Kasbon',
-        "tanggal_mulai": "-",
-        "tanggal_selesai": '-',
+        "tanggal_mulai": DateFormat("MMMM").format(DateTime.now()),
+        "tanggal_selesai": DateFormat("MMMM").format(DateTime.now()),
         "jenis": '-',
         "image": '-',
         "nama": nama

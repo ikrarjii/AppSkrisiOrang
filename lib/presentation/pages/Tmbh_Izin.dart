@@ -115,12 +115,12 @@ class _TambhIzinState extends State<TambhIzin> {
 
       String nama = docUser.docs[0]["nama"];
 
-      var snapshot = await FirebaseStorage.instance
-          .ref()
-          .child("images")
-          .child('${DateTime.now()}-bukti.jpg')
-          .putFile(image!);
-      var downloadUrl = await snapshot.ref.getDownloadURL();
+      // var snapshot = await FirebaseStorage.instance
+      //     .ref()
+      //     .child("images")
+      //     .child('${DateTime.now()}-bukti.jpg')
+      //     .putFile(image!);
+      // var downloadUrl = await snapshot.ref.getDownloadURL();
 
       final doc = FirebaseFirestore.instance.collection("pengajuan");
       final json = {
@@ -131,7 +131,7 @@ class _TambhIzinState extends State<TambhIzin> {
         "tanggal_selesai": selectedDate1,
         "keterangan": keteranganController.text.trim(),
         "status": "0",
-        "image": downloadUrl,
+        // "image": downloadUrl,
         "month": DateFormat("MMMM").format(DateTime.now()),
         "tipe_pengajuan": 'Izin',
         "biaya": "-",

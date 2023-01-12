@@ -25,6 +25,24 @@ class _profilState extends State<Profil> {
   bool isSelected = false;
   File? image;
 
+  // var _nama = "";
+  // var _email = "";
+  // var _alamat = "";
+  // var _noHp = "";
+  // var _noRek = "";
+
+  final _nama = TextEditingController();
+  final _email = TextEditingController();
+  final _alamat = TextEditingController();
+  final _noHp = TextEditingController();
+  final _noRek = TextEditingController();
+
+  // void dispose() {
+  //   _nama.dispose();
+
+  //   super.dispose();
+  // }
+
   Future pikcImage() async {
     try {
       final image = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -76,6 +94,7 @@ class _profilState extends State<Profil> {
   Widget build(BuildContext context) {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     final user = FirebaseAuth.instance.currentUser;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Warna.hijau2,
@@ -109,8 +128,12 @@ class _profilState extends State<Profil> {
                 : ListView.builder(
                     itemCount: snapshot.data!.docs.length,
                     itemBuilder: (context, index) {
+                      TextEditingController controller =
+                          TextEditingController();
                       DocumentSnapshot data = snapshot.data!.docs[index];
+
                       return ItemCard(
+                          uid: data.id,
                           nama: data['nama'],
                           email: data['email'],
                           alamat: data['alamat'],
@@ -125,7 +148,8 @@ class _profilState extends State<Profil> {
   } // SizedBox(
 
   Container ItemCard(
-      {String? nama,
+      {String? uid,
+      String? nama,
       String? email,
       String? alamat,
       String? no_hp,
@@ -148,6 +172,7 @@ class _profilState extends State<Profil> {
           ),
           FormCustom(
             text: nama ?? "",
+            controller: _nama,
           ),
           SizedBox(
             height: 5,
@@ -164,6 +189,7 @@ class _profilState extends State<Profil> {
           ),
           FormCustom(
             text: email ?? "",
+            controller: _email,
           ),
           SizedBox(
             height: 5,
@@ -180,6 +206,7 @@ class _profilState extends State<Profil> {
           ),
           FormCustom(
             text: alamat ?? "",
+            controller: _alamat,
           ),
           SizedBox(
             height: 5,
@@ -196,6 +223,7 @@ class _profilState extends State<Profil> {
           ),
           FormCustom(
             text: no_hp ?? "",
+            controller: _noHp,
           ),
           SizedBox(
             height: 5,
@@ -212,6 +240,7 @@ class _profilState extends State<Profil> {
           ),
           FormCustom(
             text: no_rekening ?? "",
+            controller: _noRek,
           ),
           SizedBox(
             height: 5,
@@ -226,7 +255,16 @@ class _profilState extends State<Profil> {
                 padding: EdgeInsets.symmetric(vertical: 17),
               ),
               child: Text("Update"),
-              onPressed: () {},
+              onPressed: () {
+                FirebaseFirestore firestore = FirebaseFirestore.instance;
+                firestore.collection("users").doc(uid).update({
+                  'nama': _nama.text,
+                  'Email': _email.text,
+                  'Alamat': _alamat.text,
+                  'no_hp': _noHp.text,
+                  'no_rekening': _noRek.text,
+                });
+              },
             ),
           ),
           Container(

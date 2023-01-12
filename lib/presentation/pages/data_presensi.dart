@@ -115,6 +115,9 @@ class _DataPresensiState extends State<DataPresensi> {
     }
   }
 
+  // Stream collectionStream = FirebaseFirestore.instance.collection('users').snapshots();
+  // Stream documentStream = FirebaseFirestore.instance.collection('users').doc('ABC123').snapshots();
+
   @override
   Widget build(BuildContext context) {
     FirebaseFirestore firestore = FirebaseFirestore.instance;

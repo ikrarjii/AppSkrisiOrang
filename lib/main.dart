@@ -31,7 +31,7 @@ void main() async {
 final navigatorKey = GlobalKey<NavigatorState>();
 
 class MyApp extends StatelessWidget {
-  @override
+  @override 
   Widget build(BuildContext context) {
     return MaterialApp(
         home: MainPage(),
