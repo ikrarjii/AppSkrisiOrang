@@ -20,7 +20,7 @@ class Check_lemburPage extends StatefulWidget {
 
 class _Check_lemburPageState extends State<Check_lemburPage> {
   Future scanQR() async {
-    //String barcodeScanRes;
+    // String barcodeScanRes;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       // barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
@@ -59,7 +59,7 @@ class _Check_lemburPageState extends State<Check_lemburPage> {
         Utils.showSnackBar(e.message, Colors.red);
       }
       // print(barcodeScanRes);
-    } on PlatformException {
+    }on PlatformException {
       //barcodeScanRes = 'Failed to get platform version.';
     }
 
@@ -72,7 +72,7 @@ class _Check_lemburPageState extends State<Check_lemburPage> {
   }
 
   Future scanQROut(String? id) async {
-    String barcodeScanRes;
+    // String barcodeScanRes;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       // barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
@@ -107,13 +107,13 @@ class _Check_lemburPageState extends State<Check_lemburPage> {
       }
       // print(barcodeScanRes);
     } on PlatformException {
-      barcodeScanRes = 'Failed to get platform version.';
+      // barcodeScanRes = 'Failed to get platform version.';
     }
 
     // If the widget was removed from the tree while the asynchronous platform
     // message was in flight, we want to discard the reply rather than calling
     // setState to update our non-existent appearance.
-    if (!mounted) return;
+    // if (!mounted) return;
 
     //print(barcodeScanRes);
   }

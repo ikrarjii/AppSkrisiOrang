@@ -46,18 +46,49 @@ class _CheckPageState extends State<CheckPage> {
         String nama = docUser.docs[0]["nama"];
 
         final doc = FirebaseFirestore.instance.collection("absen");
-        DateTime now = DateTime.now();
-        final json = {
-          "nama": nama,
-          //"email": user!.email,
-          "created_at": now,
-          "check_in": now,
-          "check_out": "",
-          "month": DateFormat("MMMM").format(now),
-          "tanggal": DateFormat("EEEE, dd MMMM yyyy").format(now)
-        };
+        final dataAbsen = await doc
+            .where(
+              "email",
+              isEqualTo: user.email,
+            )
+            .get();
 
-        await doc.add(json);
+        DateTime now = DateTime.now();
+
+        if (dataAbsen.size == 0) {
+          final json = {
+            "nama": nama,
+            //"email": user!.email,
+            "created_at": now,
+            "check_in": now,
+            "check_out": "",
+            "alpa": 0,
+            "month": DateFormat("MMMM").format(now),
+            "tanggal": DateFormat("EEEE, dd MMMM yyyy").format(now),
+          };
+          await doc.add(json);
+        } else {
+          final d = dataAbsen.docs[0];
+          final alpa = d["alpa"];
+          final lembur = d["lembur"];
+          final cuti = d["cuti"];
+
+          print(d);
+
+          final json = {
+            "nama": nama,
+            //"email": user!.email,
+            "created_at": now,
+            "check_in": now,
+            "check_out": "",
+            "alpa": alpa,
+            "lembur": lembur,
+            "cuti": cuti,
+            "month": DateFormat("MMMM").format(now),
+            "tanggal": DateFormat("EEEE, dd MMMM yyyy").format(now),
+          };
+          // await doc.(json);
+        }
 
         Utils.showSnackBar("Berhasil Check In.", Colors.green);
 

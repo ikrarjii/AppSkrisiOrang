@@ -36,6 +36,8 @@ class _DataPresensiState extends State<DataPresensi> {
     if (selected != null && selected != selectedPeriod) {
       setState(() {
         selectedPeriod = selected;
+        /*Kode ini digunakan untuk mengecek apakah tanggal yang dipilih oleh pengguna sama dengan tanggal saat ini. 
+        Jika tidak sama, maka akan mengubah nilai dari properti selectedPeriod dengan tanggal yang baru dipilih. M*/
       });
     }
     return selectedPeriod;
@@ -81,32 +83,6 @@ class _DataPresensiState extends State<DataPresensi> {
           .putFile(image!);
       var downloadUrl = await snapshot.ref.getDownloadURL();
 
-      // final doc = FirebaseFirestore.instance.collection("pengajuan");
-      // final json = {
-      //   "email": user!.email,
-      //   // "created_at": DateTime.now(),
-      //   // "jenis": dropDownValue,
-      //   // "tanggal_mulai": selectedDate,
-      //   // "tanggal_selesai": selectedDate1,
-      //   // "keterangan": keteranganController.text.trim(),
-      //   // "status": "0",
-      //   "image": downloadUrl,
-      //   // "month": DateFormat("MMMM").format(DateTime.now()),
-      //   // "tipe_pengajuan": 'Izin',
-      //   // "biaya": "-",
-      //   // "tanggal": '-',
-      //   // "nama": nama
-      // };
-
-      // await doc.add(json);
-
-      // Utils.showSnackBar("Berhasil Tambah Izin.", Colors.green);
-      // keteranganController.clear();
-      // setState(() {
-
-      //   image = null;
-
-      // });
       Navigator.of(context, rootNavigator: true).pop('dialog');
       // navigatorKey.currentState!.pop();
     } on FirebaseAuthException catch (e) {
@@ -126,21 +102,41 @@ class _DataPresensiState extends State<DataPresensi> {
       padding: EdgeInsets.only(bottom: 5),
       child: StreamBuilder<QuerySnapshot>(
         stream: firestore
-            .collection("users")
+            .collection(
+              "users",
+            )
             .where("email", isEqualTo: user!.email)
             .snapshots(),
         builder: (context, snapshot) {
-          return !snapshot.hasData
-              ? Center(
-                  child: CircularProgressIndicator(),
-                )
-              : ListView.builder(
+          return StreamBuilder<QuerySnapshot>(
+              stream: firestore
+                  .collection(
+                    "presensi",
+                  )
+                  .where(
+                    "email",
+                    isEqualTo: user.email,
+                  )
+                  .snapshots(),
+              builder: (context, snapshot2) {
+                if (!snapshot.hasData || !snapshot2.hasData) {
+                  return CircularProgressIndicator();
+                }
+                return ListView.builder(
                   itemCount: snapshot.data!.docs.length,
                   itemBuilder: (context, index) {
                     DocumentSnapshot data = snapshot.data!.docs[index];
-                    return ItemCard(nama: data['nama']);
+                    // DocumentSnapshot data2 = snapshot2.data!.docs[index];
+                    return ItemCard(
+                      nama: data['nama'],
+                      // email: data2['email'],
+                      // month: DateFormat('EEEE dd MMMM yyyy')
+                      //     .format(data2['month'])
+                      //     .toString(),
+                    );
                   },
                 );
+              });
         },
       ),
     );
@@ -148,6 +144,8 @@ class _DataPresensiState extends State<DataPresensi> {
 
   Container ItemCard({
     String? nama,
+    // String? month,
+    String? email,
   }) {
     return Container(
       child: Column(
@@ -266,7 +264,7 @@ class _DataPresensiState extends State<DataPresensi> {
             child: Column(children: [
               ItemPresensi(
                 text1: 'Hadir',
-                text2: '0 Hari',
+                text2: email ?? "",
               ),
               ItemPresensi(
                 text1: 'Alpa',

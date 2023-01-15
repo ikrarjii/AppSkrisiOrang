@@ -1,5 +1,5 @@
-class data {
-  final String email;
+// class data {
+//   final String email;
 
-  data({this.email});
-}
+//   data({this.email});
+// }
