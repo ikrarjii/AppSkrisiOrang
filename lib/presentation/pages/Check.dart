@@ -25,8 +25,8 @@ class _CheckPageState extends State<CheckPage> {
     //String barcodeScanRes;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      // barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-      //     '#ff6666', 'Cancel', true, ScanMode.QR);
+      var barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+          '#ff6666', 'Cancel', true, ScanMode.QR);
       await scanner.scan();
       final user = FirebaseAuth.instance.currentUser;
 
@@ -173,128 +173,134 @@ class _CheckPageState extends State<CheckPage> {
                       DateFormat("EEEE, dd MMMM yyyy").format(DateTime.now()))
               .snapshots(),
           builder: (context, snapshot) {
-            bool isCheckIn = snapshot.data!.docs.length > 0;
-            bool isCheckOut = snapshot.data!.docs.length > 0 &&
-                snapshot.data!.docs[0]["check_out"] != "";
-            return Column(
-              children: <Widget>[
-                Container(
-                  child: Stack(
-                    children: [
-                      Container(
-                          child: Image.asset(
-                        Gambar.lmbur,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: MediaQuery.of(context).size.height * 0.4,
-                      )),
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.4,
-                        child: Container(),
-                      ),
-                      Container(
-                        margin: EdgeInsets.symmetric(vertical: 20),
-                        width: double.infinity,
-                        padding: EdgeInsets.only(),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Container(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  IconButton(
-                                      icon: Icon(Icons.arrow_back),
-                                      color: Warna.putih,
-                                      onPressed: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    MyPages()));
-                                      }),
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            Title(
-                              color: Warna.putih,
-                              child: Text(
-                                (DateFormat('KK:mm').format(DateTime.now())),
-                                style: TextStyle(
-                                  color: Warna.putih,
-                                  fontSize: 32,
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Title(
-                              color: Warna.hijau2,
-                              child: Text(
-                                (DateFormat('dd MMMM yyyy')
-                                    .format(DateTime.now())),
-                                style: TextStyle(
-                                  color: Warna.putih,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        height: 2,
-                      ),
-                      Container(
-                          margin: EdgeInsets.only(top: 180, bottom: 10),
+            if (snapshot.hasData) {
+              bool isCheckIn = snapshot.data!.docs.length > 0;
+              bool isCheckOut = snapshot.data!.docs.length > 0 &&
+                  snapshot.data!.docs[0]["check_out"] != "";
+              return Column(
+                children: <Widget>[
+                  Container(
+                    child: Stack(
+                      children: [
+                        Container(
+                            child: Image.asset(
+                          Gambar.lmbur,
+                          fit: BoxFit.cover,
                           width: double.infinity,
-                          padding: EdgeInsets.all(25),
-                          child: !isCheckIn
-                              ? ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    primary: Warna.kuning,
-                                    padding: EdgeInsets.symmetric(vertical: 20),
+                          height: MediaQuery.of(context).size.height * 0.4,
+                        )),
+                        Container(
+                          height: MediaQuery.of(context).size.height * 0.4,
+                          child: Container(),
+                        ),
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 20),
+                          width: double.infinity,
+                          padding: EdgeInsets.only(),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Container(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    IconButton(
+                                        icon: Icon(Icons.arrow_back),
+                                        color: Warna.putih,
+                                        onPressed: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      MyPages()));
+                                        }),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Title(
+                                color: Warna.putih,
+                                child: Text(
+                                  (DateFormat('KK:mm').format(DateTime.now())),
+                                  style: TextStyle(
+                                    color: Warna.putih,
+                                    fontSize: 32,
                                   ),
-                                  child: Text("Check In"),
-                                  onPressed: () {
-                                    scanQR();
-                                    // Navigator.push(context,
-                                    //     MaterialPageRoute(builder: (context) => Csan()));
-                                  },
-                                )
-                              : isCheckIn && !isCheckOut
-                                  ? ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        primary: Warna.mrah,
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 20),
-                                      ),
-                                      child: Text("Check Out"),
-                                      onPressed: () {
-                                        scanQROut(snapshot.data!.docs[0].id);
-                                        // Navigator.push(context,
-                                        //     MaterialPageRoute(builder: (context) => Csan()));
-                                      },
-                                    )
-                                  : Container())
-                    ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Title(
+                                color: Warna.hijau2,
+                                child: Text(
+                                  (DateFormat('dd MMMM yyyy')
+                                      .format(DateTime.now())),
+                                  style: TextStyle(
+                                    color: Warna.putih,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 2,
+                        ),
+                        Container(
+                            margin: EdgeInsets.only(top: 180, bottom: 10),
+                            width: double.infinity,
+                            padding: EdgeInsets.all(25),
+                            child: !isCheckIn
+                                ? ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      primary: Warna.kuning,
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 20),
+                                    ),
+                                    child: Text("Check In"),
+                                    onPressed: () {
+                                      scanQR();
+                                      // Navigator.push(context,
+                                      //     MaterialPageRoute(builder: (context) => Csan()));
+                                    },
+                                  )
+                                : isCheckIn && !isCheckOut
+                                    ? ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          primary: Warna.mrah,
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 20),
+                                        ),
+                                        child: Text("Check Out"),
+                                        onPressed: () {
+                                          scanQROut(snapshot.data!.docs[0].id);
+                                          // Navigator.push(context,
+                                          //     MaterialPageRoute(builder: (context) => Csan()));
+                                        },
+                                      )
+                                    : Container())
+                      ],
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                      itemCount: snapshot.data!.docs.length,
-                      itemBuilder: (context, index) {
-                        DocumentSnapshot data = snapshot.data!.docs[index];
-                        return ItemCard1(data);
-                      }),
-                ),
-              ],
-            );
+                  Expanded(
+                    child: ListView.builder(
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+                          DocumentSnapshot data = snapshot.data!.docs[index];
+                          return ItemCard1(data);
+                        }),
+                  ),
+                ],
+              );
+            }
+            return CircularProgressIndicator();
+
+            //ffff
           }),
     );
   }

@@ -123,7 +123,7 @@ class _DataPresensiState extends State<DataPresensi> {
       padding: EdgeInsets.only(bottom: 5),
       child: StreamBuilder<QuerySnapshot>(
         stream: firestore
-            .collection("absen")
+            .collection("users")
             .where("email", isEqualTo: user!.email)
             .snapshots(),
         builder: (context, snapshot) {
@@ -131,11 +131,11 @@ class _DataPresensiState extends State<DataPresensi> {
               ? Center(
                   child: CircularProgressIndicator(),
                 )
-              : ListView.builder(
+              : ListView.builder( 
                   itemCount: snapshot.data!.docs.length,
                   itemBuilder: (context, index) {
                     DocumentSnapshot data = snapshot.data!.docs[index];
-                    return ItemCard(nama: data['email']);
+                    return ItemCard(nama: data['nama']);
                   },
                 );
         },
@@ -145,7 +145,6 @@ class _DataPresensiState extends State<DataPresensi> {
 
   Container ItemCard({
     String? nama,
-    String? email,
   }) {
     return Container(
       child: Column(
@@ -264,7 +263,7 @@ class _DataPresensiState extends State<DataPresensi> {
             child: Column(children: [
               ItemPresensi(
                 text1: 'Hadir',
-                text2: email ?? " ",
+                text2: '0 Hari',
               ),
               ItemPresensi(
                 text1: 'Alpa',
