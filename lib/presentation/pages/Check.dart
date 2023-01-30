@@ -21,153 +21,203 @@ class CheckPage extends StatefulWidget {
 }
 
 class _CheckPageState extends State<CheckPage> {
-  Future scanQR() async {
-    //String barcodeScanRes;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      var barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-          '#ff6666', 'Cancel', true, ScanMode.QR);
-      await scanner.scan();
-      final user = FirebaseAuth.instance.currentUser;
+  Future<void> scanQR() async {
+    // String barcodeScanRes;
+    // // int _StatusGaji = 123456;
+    // // Platform messages may fail, so we use a try/catch PlatformException.
 
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
+    // barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+    //     '#ff6666', 'Cancel', true, ScanMode.QR);
+    // await scanner.scan();
+    final user = await FirebaseAuth.instance.currentUser;
 
-      try {
-        final docUser = await FirebaseFirestore.instance
-            .collection("users")
-            .where("email", isEqualTo: user!.email)
-            .get();
-        String nama = docUser.docs[0]["nama"];
+    String uid = await user!.uid;
 
-        final doc = FirebaseFirestore.instance.collection("absen");
-        final dataAbsen = await doc
-            .where(
-              "email",
-              isEqualTo: user.email,
-            )
-            .get();
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-        DateTime now = DateTime.now();
+    CollectionReference<Map<String, dynamic>> cPresent =
+        await firestore.collection("users").doc(uid).collection("present");
 
-        if (dataAbsen.size == 0) {
-          final json = {
-            "nama": nama,
-            //"email": user!.email,
-            "created_at": now,
-            "check_in": now,
-            "check_out": "",
-            "alpa": 0,
-            "month": DateFormat("MMMM").format(now),
-            "tanggal": DateFormat("EEEE, dd MMMM yyyy").format(now),
-          };
-          await doc.add(json);
-        } else {
-          final d = dataAbsen.docs[0];
-          final alpa = d["alpa"];
-          final lembur = d["lembur"];
-          final cuti = d["cuti"];
+    QuerySnapshot<Map<String, dynamic>> snapPrensent = await cPresent.get();
+    // print("ffff");
+    // print("masuk = ${snapPrensent.docs.length}");
+    DateTime now = DateTime.now();
+    String todayDocID = DateFormat().add_yMd().format(now).replaceAll("/", "-");
+    // print(todayDocID);
 
-          print(d);
-
-          final json = {
-            "nama": nama,
-            //"email": user!.email,
-            "created_at": now,
-            "check_in": now,
-            "check_out": "",
-            "alpa": alpa,
-            "lembur": lembur,
-            "cuti": cuti,
-            "month": DateFormat("MMMM").format(now),
-            "tanggal": DateFormat("EEEE, dd MMMM yyyy").format(now),
-          };
-          // await doc.(json);
+    if (snapPrensent.docs.length == 0) {
+      await cPresent.doc(todayDocID).set({
+        "masuk": {
+          "date": now.toIso8601String(),
         }
-
-        Utils.showSnackBar("Berhasil Check In.", Colors.green);
-
-        Navigator.of(context, rootNavigator: true).pop('dialog');
-        // navigatorKey.currentState!.pop();
-      } on FirebaseAuthException catch (e) {
-        Navigator.of(context, rootNavigator: true).pop('dialog');
-        Utils.showSnackBar(e.message, Colors.red);
-      }
-      // print(barcodeScanRes);
-    } on PlatformException {
-      //barcodeScanRes = 'Failed to get platform version.';
+      });
     }
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
+    // showDialog(
+    //   context: context,
+    //   barrierDismissible: false,
+    //   builder: (context) => Center(
+    //     child: CircularProgressIndicator(),
+    //   ),
+    // );
 
-    //print(barcodeScanRes);
+    // DateTime now = DateTime.now();
+
+    // String _status = "";
+
+    // if (now.hour >= 6 && now.hour <= 8) {
+    //   setState(() {
+    //     _status = "Normal";
+    //   });
+    // } else if (now.hour >= 8 && now.hour <= 5) {
+    //   setState(() {
+    //     _status = "terlambat";
+    //   });
+    // }
+
+    // await FirebaseFirestore.instance.collection('users').doc().update({
+    //   "status": _status,
+    // });
+
+    // try {
+    //   final docUser = await FirebaseFirestore.instance
+    //       .collection("users")
+    //       .where("email", isEqualTo: user!.email)
+    //       .get();
+
+    //   String nama = docUser.docs[0]["nama"];
+    //   final doc = FirebaseFirestore.instance.collection("absen");
+
+    //   await FirebaseFirestore.instance.collection('users').doc().update({
+    //     "check_in": now,
+    //   });
+
+    // print(now);
+
+    // final json = {
+    //   "nama": nama,
+    //   "email": user.email,
+    //   "created_at": now,
+    //   "check_in": now,
+    //   "check_out": "",
+    //   "month": DateFormat("MMMM").format(now),
+    //   "tanggal": DateFormat("EEEE, dd MMMM yyyy").format(now),
+    // };
+
+    // await doc.add(json);
+
+    //   Utils.showSnackBar("Berhasil Check In.", Colors.green);
+
+    //   Navigator.of(context, rootNavigator: true).pop('dialog');
+    //   // navigatorKey.currentState!.pop();
+    // } on FirebaseAuthException catch (e) {
+    //   Navigator.of(context, rootNavigator: true).pop('dialog');
+    //   Utils.showSnackBar(e.message, Colors.red);
+    // }
+    // print(barcodeScanRes);,
+
+    // print(barcodeScanRes);
   }
 
-  Future scanQROut(String? id) async {
-    String barcodeScanRes;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      // barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-      //     '#ff6666', 'Cancel', true, ScanMode.QR);
-      await scanner.scan();
-      final user = FirebaseAuth.instance.currentUser;
+  // Future scanQROut(String? id) async {
+  //   String barcodeScanRes;
+  //   int absen;
+  //   // Platform messages may fail, so we use a try/catch PlatformException.
+  //   try {
+  //     barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+  //         '#ff6666', 'Cancel', true, ScanMode.QR);
+  //     await scanner.scan();
+  //     final user = FirebaseAuth.instance.currentUser;
 
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
+  //     // showDialog(
+  //     //   context: context,
+  //     //   barrierDismissible: false,
+  //     //   builder: (context) => Center(
+  //     //     child: CircularProgressIndicator(),
+  //     //   ),
+  //     // );
 
-      try {
-        final doc = FirebaseFirestore.instance.collection("absen").doc(id);
-        DateTime now = DateTime.now();
-        final json = {
-          "check_out": now,
-        };
+  //     try {
+  //       final doc = FirebaseFirestore.instance.collection("users").doc(id);
+  //       DateTime now = DateTime.now();
+  //       // String _StatusC = "";
 
-        await doc.update(json);
+  //       final user = FirebaseAuth.instance.currentUser;
 
-        Utils.showSnackBar("Berhasil Check Out.", Colors.green);
+  //       // if (now.hour >= 16 && now.hour <= 17) {
+  //       //   _StatusC = "Pulang tepat waktu";
+  //       // } else {
+  //       //   _StatusC = "Lembur";
+  //       // }
 
-        Navigator.of(context, rootNavigator: true).pop('dialog');
-        // navigatorKey.currentState!.pop();
-      } on FirebaseAuthException catch (e) {
-        Navigator.of(context, rootNavigator: true).pop('dialog');
-        Utils.showSnackBar(e.message, Colors.red);
-      }
-      // print(barcodeScanRes);
-    } on PlatformException {
-      barcodeScanRes = 'Failed to get platform version.';
-    }
+  //       // await FirebaseFirestore.instance.collection('users').doc().update({
+  //       //   "statusD": _StatusC,
+  //       // });
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
+  //       final json = {
+  //         "check_out": now,
+  //         // "statusOut": _StatusC,
+  //         // 'gaji': _StatusGaji,
+  //       };
 
-    //print(barcodeScanRes);
-  }
+  //       await doc.set(json);
+
+  //       // final docUser = FirebaseFirestore.instance.collection('users').doc(id);
+
+  //       // final jsonn = {
+  //       //   'gaji': _StatusGaji,
+  //       // };
+
+  //       // await docUser.set(jsonn);
+
+  //       Utils.showSnackBar("Berhasil Check Out.", Colors.green);
+
+  //       Navigator.of(context, rootNavigator: true).pop('dialog');
+  //       // navigatorKey.currentState!.pop();
+  //     } on FirebaseAuthException catch (e) {
+  //       Navigator.of(context, rootNavigator: true).pop('dialog');
+  //       Utils.showSnackBar(e.message, Colors.red);
+  //     }
+  //     // print(barcodeScanRes);
+  //   } on PlatformException {
+  //     barcodeScanRes = 'Failed to get platform version.';
+  //   }
+
+  //   // If the widget was removed from the tree while the asynchronous platform
+  //   // message was in flight, we want to discard the reply rather than calling
+  //   // setState to update our non-existent appearance.
+  //   if (!mounted) return;
+
+  //   //print(barcodeScanRes);
+  // }
 
   @override
   Widget build(BuildContext context) {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     final user = FirebaseAuth.instance.currentUser;
 
+    // String nama = data['nama'];
+
+    // final _alamat = "";
+    // final _created_at = "";
+    // final _device_id = "";
+    // final _email = "";
+    // final _nama = "";
+    // final _no_hp = "";
+    // final _no_rekening = "";
+    // final _uid = "";
+
+    // String nama = data['nama'];
+    // int umur = data['umur'];
+    // FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    // var data = await Firestore.instance.collection('nama_collection').document('document_id').get();
+
     return Scaffold(
       body: StreamBuilder<QuerySnapshot>(
           stream: firestore
-              .collection("absen")
-              // .where("email", isEqualTo: user!.email)
+              .collection("users")
+              .where("email", isEqualTo: user!.email)
               .where("tanggal",
                   isEqualTo:
                       DateFormat("EEEE, dd MMMM yyyy").format(DateTime.now()))
@@ -263,8 +313,9 @@ class _CheckPageState extends State<CheckPage> {
                                           EdgeInsets.symmetric(vertical: 20),
                                     ),
                                     child: Text("Check In"),
-                                    onPressed: () {
-                                      scanQR();
+                                    onPressed: () async {
+                                      await scanQR();
+
                                       // Navigator.push(context,
                                       //     MaterialPageRoute(builder: (context) => Csan()));
                                     },
@@ -278,7 +329,13 @@ class _CheckPageState extends State<CheckPage> {
                                         ),
                                         child: Text("Check Out"),
                                         onPressed: () {
-                                          scanQROut(snapshot.data!.docs[0].id);
+                                          // scanQROut(snapshot.data!.docs[0].id);
+                                          // final user =
+                                          //     FirebaseAuth.instance.currentUser;
+                                          // var id = user.uid;
+                                          //  DateTime noww = DateTime.now();
+                                          //  String nama = docUser.docs[0]["nama"];
+
                                           // Navigator.push(context,
                                           //     MaterialPageRoute(builder: (context) => Csan()));
                                         },
@@ -298,9 +355,9 @@ class _CheckPageState extends State<CheckPage> {
                 ],
               );
             }
-            return CircularProgressIndicator();
 
-            //ffff
+            return CircularProgressIndicator();
+            //batass
           }),
     );
   }

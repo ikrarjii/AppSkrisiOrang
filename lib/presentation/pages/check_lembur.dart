@@ -137,7 +137,6 @@ class _Check_lemburPageState extends State<Check_lemburPage> {
               bool isCheckIn = snapshot.data!.docs.length > 0;
               bool isCheckOut = snapshot.data!.docs.length > 0 &&
                   snapshot.data!.docs[0]["check_out"] != "";
-
               return Column(
                 children: <Widget>[
                   Container(
@@ -272,10 +271,11 @@ class _Check_lemburPageState extends State<Check_lemburPage> {
                   ),
                 ],
               );
-              //dddd
             }
 
             return CircularProgressIndicator();
+
+            //batass
           }),
     );
   }

@@ -74,12 +74,12 @@ class _DataPresensiState extends State<DataPresensi> {
 
       String nama = docUser.docs[0]["nama"];
 
-      var snapshot = await FirebaseStorage.instance
-          .ref()
-          .child("images")
-          .child('${DateTime.now()}-bukti.jpg')
-          .putFile(image!);
-      var downloadUrl = await snapshot.ref.getDownloadURL();
+      // var snapshot = await FirebaseStorage.instance
+      //     .ref()
+      //     .child("images")
+      //     .child('${DateTime.now()}-bukti.jpg')
+      //     .putFile(image!);
+      // var downloadUrl = await snapshot.ref.getDownloadURL();
 
       // final doc = FirebaseFirestore.instance.collection("pengajuan");
       // final json = {
@@ -131,11 +131,11 @@ class _DataPresensiState extends State<DataPresensi> {
               ? Center(
                   child: CircularProgressIndicator(),
                 )
-              : ListView.builder( 
+              : ListView.builder(
                   itemCount: snapshot.data!.docs.length,
                   itemBuilder: (context, index) {
                     DocumentSnapshot data = snapshot.data!.docs[index];
-                    return ItemCard(nama: data['nama']);
+                    return ItemCard(nama: data['nama'], gaji: data['gaji']);
                   },
                 );
         },
@@ -145,6 +145,8 @@ class _DataPresensiState extends State<DataPresensi> {
 
   Container ItemCard({
     String? nama,
+    int? gaji,
+    final int a = 10,
   }) {
     return Container(
       child: Column(
@@ -160,26 +162,41 @@ class _DataPresensiState extends State<DataPresensi> {
                 Container(
                   margin: EdgeInsets.only(top: 15),
                   width: double.infinity,
-                  padding: EdgeInsets.symmetric(horizontal: 129, vertical: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 130, vertical: 20),
                   child: Stack(
                     children: [
-                      CircleAvatar(
-                        radius: 45,
-                        backgroundColor: Colors.white,
-                        backgroundImage: AssetImage(Gambar.logouin),
+                      ClipOval(
+                        child: Container(
+                          width: 90,
+                          height: 90,
+                          child: Image.network(
+                            "https://ui-avatars.com/api/?name=${nama}",
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                       ),
+
+                      // CircleAvatar(
+                      //   radius: 45,
+                      //   backgroundColor: Colors.white,
+                      //   backgroundImage: AssetImage(Gambar.logouin),
+                      // ),
                       image != null
                           ? InkWell(
                               onTap: () {
                                 pikcImage();
                               },
-                              child: Image.file(
-                                image!,
-                                height: 150,
-                                width: 150,
-                                fit: BoxFit.cover,
+                              child: ClipOval(
+                                child: Image.file(
+                                  image!,
+                                  height: 90,
+                                  width: 90,
+                                  fit: BoxFit.cover,
+                                ),
                               ))
                           : Container(
+                              width: 90,
+                              height: 90,
                               padding: EdgeInsets.only(top: 50, left: 60),
                               child: IconButton(
                                   icon: Icon(Icons.add_a_photo),
@@ -189,16 +206,18 @@ class _DataPresensiState extends State<DataPresensi> {
                                     pikcImage();
                                   }),
                             ),
-                      // Positioned(
-
-                      //     bottom: 0,
-                      //     right: 20,
-                      //     child: InkWell(
-                      //       child: Icon(Icons.camera_alt),
-                      //       onTap: () {
-
-                      //       },
-                      //     )),
+                      Positioned(
+                          bottom: 0,
+                          right: 20,
+                          child: InkWell(
+                            child: Icon(
+                              Icons.camera_alt,
+                              color: Colors.white,
+                            ),
+                            onTap: () {
+                              pikcImage();
+                            },
+                          )),
                     ],
                   ),
                 ),
@@ -262,24 +281,24 @@ class _DataPresensiState extends State<DataPresensi> {
             width: double.infinity,
             child: Column(children: [
               ItemPresensi(
-                text1: 'Hadir',
-                text2: '0 Hari',
+                text1: 'Gaji',
+                text2: "Rp. ${gaji.toString()}",
               ),
               ItemPresensi(
-                text1: 'Alpa',
-                text2: '0 Hari',
+                text1: 'Total Lembur',
+                text2: "Rp. ${gaji.toString()}",
               ),
               ItemPresensi(
-                text1: 'Lembur',
-                text2: '0 kali',
+                text1: 'Total Bonus',
+                text2: "Rp. ${gaji.toString()}",
               ),
               ItemPresensi(
-                text1: 'Sisa Cuti',
-                text2: '0 Hari',
+                text1: 'Total Keterlambatan',
+                text2: "Rp. ${gaji.toString()}",
               ),
               ItemPresensi(
                 text1: 'Gaji Bulan ini',
-                text2: 'Rp.0',
+                text2: "Rp. ${gaji.toString()}",
               ),
             ]),
           ),
