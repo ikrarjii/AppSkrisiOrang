@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/main.dart';
 import 'package:flutter_application_1/presentation/pages/Tmbh_Izin.dart';
 import 'package:flutter_application_1/Utils/Utils.dart';
+import 'package:intl/intl.dart';
 import '../widgets/formcuxtom.dart';
 import 'package:flutter_application_1/presentation/pages/login.dart';
 import 'package:flutter_application_1/presentation/resources/warna.dart';
@@ -256,6 +257,9 @@ class _profilState extends State<Profil> {
               ),
               child: Text("Update"),
               onPressed: () {
+                DateTime now = DateTime.now();
+                String todayDocID =
+                    DateFormat().add_yMd().format(now).replaceAll("/", "-");
                 FirebaseFirestore firestore = FirebaseFirestore.instance;
                 firestore.collection("users").doc(uid).update({
                   'nama': _nama.text,

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/presentation/pages/Profil.dart';
+import 'package:flutter_application_1/presentation/pages/home.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -13,6 +14,8 @@ import '../resources/gambar.dart';
 import '../resources/warna.dart';
 import '../widgets/ItemPresensi.dart';
 import 'package:image_picker/image_picker.dart';
+
+import 'my_page.dart';
 // import 'package:month_year_picker/month_year_picker.dart';
 
 class DataPresensi extends StatefulWidget {
@@ -74,12 +77,12 @@ class _DataPresensiState extends State<DataPresensi> {
 
       String nama = docUser.docs[0]["nama"];
 
-      // var snapshot = await FirebaseStorage.instance
-      //     .ref()
-      //     .child("images")
-      //     .child('${DateTime.now()}-bukti.jpg')
-      //     .putFile(image!);
-      // var downloadUrl = await snapshot.ref.getDownloadURL();
+      var snapshot = await FirebaseStorage.instance
+          .ref()
+          .child("images")
+          .child('${DateTime.now()}-bukti.jpg')
+          .putFile(image!);
+      var downloadUrl = await snapshot.ref.getDownloadURL();
 
       // final doc = FirebaseFirestore.instance.collection("pengajuan");
       // final json = {
@@ -115,195 +118,154 @@ class _DataPresensiState extends State<DataPresensi> {
     }
   }
 
+  Stream<QuerySnapshot<Map<String, dynamic>>> streamUser() async* {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String uid = auth.currentUser!.uid;
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    // var tgl = DateFormat('yMMMM').format(selectedPeriod);
+
+    // yield* firestore
+    //     .collection("users")
+    //     .doc(uid)
+    //     .collection("present")
+    //     .where("bulan", isEqualTo: tgl)
+    //     .snapshots();
+    final collectionReference = FirebaseFirestore.instance.collection("users").doc(uid).collection("present");
+
+collectionReference.orderBy("date").get().then((QuerySnapshot snapshot) {
+  snapshot.docs.forEach((DocumentSnapshot document) {
+    print("ffffffffffff ${document}");
+  });
+});
+
+
+  }
+ 
+
+
   @override
   Widget build(BuildContext context) {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     final user = FirebaseAuth.instance.currentUser;
-    return Container(
-      padding: EdgeInsets.only(bottom: 5),
-      child: StreamBuilder<QuerySnapshot>(
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String uid = auth.currentUser!.uid;
+    var tgl = DateFormat('yMMMM').format(selectedPeriod);
+
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: firestore
             .collection("users")
-            .where("email", isEqualTo: user!.email)
+            .doc(uid)
+            .collection("present")
+            .where("bulan", isEqualTo: tgl)
             .snapshots(),
-        builder: (context, snapshot) {
-          return !snapshot.hasData
-              ? Center(
-                  child: CircularProgressIndicator(),
-                )
-              : ListView.builder(
-                  itemCount: snapshot.data!.docs.length,
-                  itemBuilder: (context, index) {
-                    DocumentSnapshot data = snapshot.data!.docs[index];
-                    return ItemCard(nama: data['nama'], gaji: data['gaji']);
-                  },
-                );
-        },
-      ),
-    );
-  }
-
-  Container ItemCard({
-    String? nama,
-    int? gaji,
-    final int a = 10,
-  }) {
-    return Container(
-      child: Column(
-        children: <Widget>[
-          Container(
-            child: Stack(
+        builder: (context, snapPresence) {
+          if (snapPresence.hasData) {
+            return
+                // scrollDirection: Axis.vertical,
+                Column(
               children: [
-                Container(
-                  width: double.infinity,
-                  height: MediaQuery.of(context).size.height * 0.3,
-                  child: Image.asset(Gambar.home1),
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 15),
-                  width: double.infinity,
-                  padding: EdgeInsets.symmetric(horizontal: 130, vertical: 20),
-                  child: Stack(
-                    children: [
-                      ClipOval(
-                        child: Container(
-                          width: 90,
-                          height: 90,
-                          child: Image.network(
-                            "https://ui-avatars.com/api/?name=${nama}",
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
+                StreamBuilder<QuerySnapshot>(
+                  stream: streamUser(),
+                  builder: ((context, snapPresent) {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.vertical,
+                      itemCount: snapPresence.data!.docs.length,
+                      itemBuilder: (context, index) {
+                        Map<String, dynamic> data =
+                            snapPresence.data!.docs[index].data();
 
-                      // CircleAvatar(
-                      //   radius: 45,
-                      //   backgroundColor: Colors.white,
-                      //   backgroundImage: AssetImage(Gambar.logouin),
-                      // ),
-                      image != null
-                          ? InkWell(
-                              onTap: () {
-                                pikcImage();
-                              },
-                              child: ClipOval(
-                                child: Image.file(
-                                  image!,
-                                  height: 90,
-                                  width: 90,
-                                  fit: BoxFit.cover,
+                        // totalGaji = ambil gaji yang bulan 1 lalu jumlahkan (tG)
+                        //total lembur (tL)
+                        //total bonus (tB)
+                        //mines keterlambatan (mK)
+
+                        //gaji bulan ini.bulan =  tG + tL + tb - mK
+
+                        return SingleChildScrollView(
+                            child: Container(
+                          width: double.infinity,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                height: 250,
+                                child: Container(
+                                  child: home(),
                                 ),
-                              ))
-                          : Container(
-                              width: 90,
-                              height: 90,
-                              padding: EdgeInsets.only(top: 50, left: 60),
-                              child: IconButton(
-                                  icon: Icon(Icons.add_a_photo),
-                                  iconSize: 25,
-                                  color: Warna.htam,
-                                  onPressed: () {
-                                    pikcImage();
-                                  }),
-                            ),
-                      Positioned(
-                          bottom: 0,
-                          right: 20,
-                          child: InkWell(
-                            child: Icon(
-                              Icons.camera_alt,
-                              color: Colors.white,
-                            ),
-                            onTap: () {
-                              pikcImage();
-                            },
-                          )),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.only(top: 115, left: 138),
-                  //width: 150,
-                  child: Column(
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Profil()));
-                        },
-                        child: Text(
-                          nama ?? "",
-                          style: TextStyle(
-                            fontSize: 25,
-                            color: Warna.putih,
+                              ),
+                              Container(
+                                // margin: EdgeInsets.only(top: 10),
+                                // margin: EdgeInsets.symmetric(horizontal: 30),
+                                padding: EdgeInsets.symmetric(horizontal: 20),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      DateFormat('yMMMM')
+                                          .format(selectedPeriod),
+                                      style: TextStyle(
+                                          color: Warna.hijau2,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    IconButton(
+                                        icon: Icon(Icons.keyboard_arrow_down),
+                                        color: Warna.hijau2,
+                                        onPressed: () {
+                                          _selectPeriod(context);
+                                          show = true;
+                                        }),
+                                  ],
+                                ),
+                              ),
+                              ItemPresensi(
+                                text1: 'Gaji Pokok',
+                                text2: '0 Hari',
+                              ),
+                              ItemPresensi(
+                                text1: 'Lembur',
+                                text2: '0 Hari',
+                              ),
+                              ItemPresensi(
+                                text1: 'Bonus',
+                                text2: '0 kali',
+                              ),
+                              ItemPresensi(
+                                text1: 'Keterlambatan',
+                                text2: '0 Hari',
+                              ),
+                              ItemPresensi(
+                                text1: 'Gaji Bulan ini',
+                                text2: 'Rp.0',
+                              ),
+                            ],
                           ),
-                        ),
-                      ),
-                      Text(
-                        "Karyawan",
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Warna.kuning,
-                        ),
-                      )
-                    ],
-                  ),
+                        )
+
+                            //lll
+                            );
+                        //btasss
+                      },
+                    );
+
+                    //plplp
+                  }),
                 )
+
+                // batsss ko
               ],
-            ),
-          ),
-          Container(
-            // margin: EdgeInsets.only(top: 10),
-            //margin: EdgeInsets.symmetric(horizontal: 30),
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  DateFormat('MMMM yyyy').format(selectedPeriod),
-                  style: TextStyle(
-                      color: Warna.hijau2, fontWeight: FontWeight.bold),
-                ),
-                IconButton(
-                    icon: Icon(Icons.keyboard_arrow_down),
-                    color: Warna.hijau2,
-                    onPressed: () {
-                      _selectPeriod(context);
-                      show = true;
-                    }),
-              ],
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 5),
-            width: double.infinity,
-            child: Column(children: [
-              ItemPresensi(
-                text1: 'Gaji',
-                text2: "Rp. ${gaji.toString()}",
-              ),
-              ItemPresensi(
-                text1: 'Total Lembur',
-                text2: "Rp. ${gaji.toString()}",
-              ),
-              ItemPresensi(
-                text1: 'Total Bonus',
-                text2: "Rp. ${gaji.toString()}",
-              ),
-              ItemPresensi(
-                text1: 'Total Keterlambatan',
-                text2: "Rp. ${gaji.toString()}",
-              ),
-              ItemPresensi(
-                text1: 'Gaji Bulan ini',
-                text2: "Rp. ${gaji.toString()}",
-              ),
-            ]),
-          ),
-        ],
-      ),
-    );
+            );
+          } else {
+            return Expanded(
+                child: Center(
+              child: CircularProgressIndicator(),
+            ));
+          }
+
+          //Builderrr
+        });
   }
 }

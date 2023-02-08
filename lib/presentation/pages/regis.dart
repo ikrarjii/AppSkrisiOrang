@@ -152,10 +152,7 @@ class RegisState extends State<Regis> {
         "no_hp": hpController.text.trim(),
         "uid": res.user!.uid,
         "created_at": DateTime.now(),
-        "device_id": deviceId,
-        "gaji": 0,
-        "status": "",
-        "check_in": DateTime.now(),
+        "device_id": deviceId
       };
 
       await docUser.set(json);

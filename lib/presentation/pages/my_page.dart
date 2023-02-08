@@ -8,6 +8,7 @@ import 'package:flutter_application_1/presentation/pages/check_lembur.dart';
 import 'package:flutter_application_1/presentation/pages/kasbon.dart';
 import 'package:flutter_application_1/presentation/pages/tmbh_Kasbon.dart';
 import 'data_presensi.dart';
+import 'home.dart';
 import 'login.dart';
 import 'regis.dart';
 import '../resources/warna.dart';

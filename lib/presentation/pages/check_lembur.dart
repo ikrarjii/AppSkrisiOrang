@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Utils/Utils.dart';
 import 'package:flutter_application_1/presentation/pages/Lembur.dart';
 import 'package:flutter_application_1/presentation/pages/Scan.dart';
+import 'package:flutter_application_1/presentation/pages/data_presensi.dart';
+import 'package:flutter_application_1/presentation/pages/my_page.dart';
 import 'package:flutter_application_1/presentation/resources/warna.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import '../resources/gambar.dart';
@@ -19,218 +21,214 @@ class Check_lemburPage extends StatefulWidget {
 }
 
 class _Check_lemburPageState extends State<Check_lemburPage> {
-  Future scanQR() async {
-    //String barcodeScanRes;
+  Future<void> scanQR() async {
+    String barcodeScanRes;
+    // int _StatusGaji = 123456;
     // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      // barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-      //     '#ff6666', 'Cancel', true, ScanMode.QR);
-      await scanner.scan();
-      final user = FirebaseAuth.instance.currentUser;
 
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
+    // final user = await FirebaseAuth.instance.currentUser;
 
-      try {
-        final doc = FirebaseFirestore.instance.collection("presensi");
-        DateTime now = DateTime.now();
-        final json = {
-          "email": user!.email,
-          "created_at": now,
-          "check_in": now,
-          "check_out": "",
-          "month": DateFormat("MMMM").format(now),
-          "tanggal": DateFormat("EEEE, dd MMMM yyyy").format(now)
-        };
+    // String uid = await user!.uid;'
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String uid = auth.currentUser!.uid;
 
-        await doc.add(json);
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-        Utils.showSnackBar("Berhasil Check In.", Colors.green);
+    CollectionReference<Map<String, dynamic>> cPresent =
+        await firestore.collection("users").doc(uid).collection("present");
 
-        Navigator.of(context, rootNavigator: true).pop('dialog');
-        // navigatorKey.currentState!.pop();
-      } on FirebaseAuthException catch (e) {
-        Navigator.of(context, rootNavigator: true).pop('dialog');
-        Utils.showSnackBar(e.message, Colors.red);
-      }
-      // print(barcodeScanRes);
-    } on PlatformException {
-      //barcodeScanRes = 'Failed to get platform version.';
+    // print("fffffffff = ${usr.get()}");
+    // Map<String, dynamic> data = cPresent.doc(uid).collection("users");
+
+    // final data = userss.get();
+
+    QuerySnapshot<Map<String, dynamic>> snapPrensent = await cPresent.get();
+    // print("ffff");
+    // print("masuk = ${snapPrensent.docs.length}");
+
+    // print(uid);
+    DateTime now = DateTime.now();
+    String todayDocID =
+        DateFormat().add_yMMMM().format(now).replaceAll("/", "-");
+
+    String _status = "";
+
+    int terLambat;
+    int lembur = 50000;
+
+    if (now.hour >= 6 && now.hour <= 12) {
+      _status = "Normal";
+    } else if (now.hour >= 8 && now.hour <= 5) {
+      _status = "terlambat";
     }
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
+    if (snapPrensent.docs.length >= 0) {
+      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+          '#ff6666', 'Cancel', true, ScanMode.QR);
+      await scanner.scan();
 
-    //print(barcodeScanRes);
+      await cPresent.doc(todayDocID).update({
+        "LemburStar": {
+          "date": now.toIso8601String(),
+        }
+      });
+    } else {
+      DocumentSnapshot<Map<String, dynamic>> absenn =
+          await cPresent.doc(todayDocID).get();
+
+      print(absenn.exists);
+
+      if (absenn.exists == true) {
+        Map<String, dynamic>? dataPresentTod = absenn.data();
+
+        if (dataPresentTod?["LemburOut"] != null) {
+          Utils.showSnackBar(
+              "Sukses Sudah Absen Masuk && Keluar.", Colors.green);
+        } else {
+          //absen Keluar
+          barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+              '#ff6666', 'Cancel', true, ScanMode.QR);
+          await scanner.scan();
+
+          await cPresent.doc(todayDocID).update({
+            "lemburOut": {
+              "date": now.toIso8601String(),
+            }
+          });
+        }
+      } else {
+        //masuk
+        barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+            '#ff6666', 'Cancel', true, ScanMode.QR);
+        await scanner.scan();
+        await cPresent.doc(todayDocID).update({
+          "LemburStar": {
+            "date": now.toIso8601String(),
+          }
+        });
+      }
+    }
+
+    // showDialog(
+    //   context: context,
+    //   barrierDismissible: false,
+    //   builder: (context) => Center(
+    //     child: CircularProgressIndicator(),
+    //   ),
+    // );
   }
 
-  Future scanQROut(String? id) async {
-    String barcodeScanRes;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      // barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-      //     '#ff6666', 'Cancel', true, ScanMode.QR);
-      await scanner.scan();
-      final user = FirebaseAuth.instance.currentUser;
+  Stream<QuerySnapshot<Map<String, dynamic>>> streamUser() async* {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String uid = auth.currentUser!.uid;
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-
-      try {
-        final doc = FirebaseFirestore.instance.collection("presensi").doc(id);
-        DateTime now = DateTime.now();
-        final json = {
-          "check_out": now,
-        };
-
-        await doc.update(json);
-
-        Utils.showSnackBar("Berhasil Check Out.", Colors.green);
-
-        Navigator.of(context, rootNavigator: true).pop('dialog');
-        // navigatorKey.currentState!.pop();
-      } on FirebaseAuthException catch (e) {
-        Navigator.of(context, rootNavigator: true).pop('dialog');
-        Utils.showSnackBar(e.message, Colors.red);
-      }
-      // print(barcodeScanRes);
-    } on PlatformException {
-      barcodeScanRes = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    //print(barcodeScanRes);
+    yield* firestore
+        .collection("users")
+        .doc(uid)
+        .collection("present")
+        .snapshots();
   }
 
   @override
   Widget build(BuildContext context) {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     final user = FirebaseAuth.instance.currentUser;
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String uid = auth.currentUser!.uid;
 
     return Scaffold(
-      body: StreamBuilder<QuerySnapshot>(
-          stream: firestore
-              .collection("presensi")
-              .where("email", isEqualTo: user!.email)
-              .where("tanggal",
-                  isEqualTo:
-                      DateFormat("EEEE, dd MMMM yyyy").format(DateTime.now()))
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              bool isCheckIn = snapshot.data!.docs.length > 0;
-              bool isCheckOut = snapshot.data!.docs.length > 0 &&
-                  snapshot.data!.docs[0]["check_out"] != "";
-              return Column(
-                children: <Widget>[
+      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+          stream: streamUser(),
+          builder: (context, snapPresence) {
+            return SingleChildScrollView(
+              // scrollDirection: Axis.vertical,
+              child: Column(
+                children: [
                   Container(
-                    child: Stack(
-                      children: [
-                        Container(
-                            child: Image.asset(
-                          Gambar.lmbur,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: MediaQuery.of(context).size.height * 0.4,
-                        )),
-                        Container(
-                          height: MediaQuery.of(context).size.height * 0.4,
-                          child: Container(),
-                        ),
-                        Container(
-                          margin: EdgeInsets.symmetric(vertical: 20),
-                          width: double.infinity,
-                          padding: EdgeInsets.only(),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
+                    child: StreamBuilder(
+                        stream: streamUser(),
+                        builder: (context, snap) {
+                          return Stack(
                             children: [
-                              // Container(
-                              //   child: Row(
-                              //     mainAxisAlignment: MainAxisAlignment.start,
-                              //     children: [
-                              //       IconButton(
-                              //           icon: Icon(Icons.arrow_back),
-                              //           color: Warna.putih,
-                              //           onPressed: () {
-                              //             Navigator.push(
-                              //                 context,
-                              //                 MaterialPageRoute(
-                              //                     builder: (context) =>
-                              //                         Lembur()));
-                              //           }),
-                              //     ],
-                              //   ),
-                              // ),
-                              SizedBox(
-                                height: 20,
+                              Container(
+                                  child: Image.asset(
+                                Gambar.lmbur,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.4,
+                              )),
+                              Container(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.4,
+                                child: Container(),
                               ),
-                              Title(
-                                color: Warna.hijau2,
-                                child: Text(
-                                  'Lembur',
-                                  style: TextStyle(
-                                    color: Warna.putih,
-                                    fontSize: 25,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              Container(
+                                margin: EdgeInsets.symmetric(vertical: 20),
+                                width: double.infinity,
+                                padding: EdgeInsets.only(),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Container(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          IconButton(
+                                              icon: Icon(Icons.arrow_back),
+                                              color: Warna.putih,
+                                              onPressed: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            MyPages()));
+                                              }),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    Title(
+                                      color: Warna.putih,
+                                      child: Text(
+                                        (DateFormat('KK:mm')
+                                            .format(DateTime.now())),
+                                        style: TextStyle(
+                                          color: Warna.putih,
+                                          fontSize: 32,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Title(
+                                      color: Warna.hijau2,
+                                      child: Text(
+                                        (DateFormat('dd MMMM yyyy')
+                                            .format(DateTime.now())),
+                                        style: TextStyle(
+                                          color: Warna.putih,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                               SizedBox(
-                                height: 15,
+                                height: 2,
                               ),
-                              Title(
-                                color: Warna.putih,
-                                child: Text(
-                                  (DateFormat('KK:mm').format(DateTime.now())),
-                                  style: TextStyle(
-                                    color: Warna.putih,
-                                    fontSize: 32,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Title(
-                                color: Warna.hijau2,
-                                child: Text(
-                                  (DateFormat('dd MMMM yyyy')
-                                      .format(DateTime.now())),
-                                  style: TextStyle(
-                                    color: Warna.putih,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(
-                          height: 2,
-                        ),
-                        Container(
-                            margin: EdgeInsets.only(top: 180, bottom: 10),
-                            width: double.infinity,
-                            padding: EdgeInsets.all(25),
-                            child: !isCheckIn
-                                ? ElevatedButton(
+                              Container(
+                                  margin: EdgeInsets.only(top: 180, bottom: 10),
+                                  width: double.infinity,
+                                  padding: EdgeInsets.all(25),
+                                  child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       primary: Warna.kuning,
                                       padding:
@@ -242,139 +240,172 @@ class _Check_lemburPageState extends State<Check_lemburPage> {
                                       // Navigator.push(context,
                                       //     MaterialPageRoute(builder: (context) => Csan()));
                                     },
-                                  )
-                                : isCheckIn && !isCheckOut
-                                    ? ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          primary: Warna.mrah,
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 20),
-                                        ),
-                                        child: Text("Check Out"),
-                                        onPressed: () {
-                                          scanQROut(snapshot.data!.docs[0].id);
-                                          // Navigator.push(context,
-                                          //     MaterialPageRoute(builder: (context) => Csan()));
-                                        },
-                                      )
-                                    : Container())
-                      ],
-                    ),
+                                  ))
+                            ],
+                          );
+                        }
+
+                        // batass
+
+                        ),
                   ),
-                  Expanded(
-                    child: ListView.builder(
-                        itemCount: snapshot.data!.docs.length,
+                  SizedBox(
+                    height: 10,
+                  ),
+
+                  StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                    stream: streamUser(),
+                    builder: ((context, snapPresent) {
+                      if (snapPresence.data?.docs.length == 0 ||
+                          snapPresence.data == null) {
+                        return SizedBox(
+                          height: 400,
+                          child: Center(
+                            child:
+                                Text("Maaf, History absen anda belum ada!!!"),
+                          ),
+                        );
+                      }
+
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        scrollDirection: Axis.vertical,
+                        itemCount: snapPresence.data!.docs.length,
                         itemBuilder: (context, index) {
-                          DocumentSnapshot data = snapshot.data!.docs[index];
-                          return ItemCard1(data);
-                        }),
-                  ),
+                          Map<String, dynamic> data =
+                              snapPresence.data!.docs[index].data();
+
+                          // totalGaji = ambil gaji yang bulan 1 lalu jumlahkan (tG)
+                          //total lembur (tL)
+                          //total bonus (tB)
+                          //mines keterlambatan (mK)
+
+                          //gaji bulan ini.bulan =  tG + tL + tb - mK
+
+                          return SingleChildScrollView(
+                            child: Container(
+                              alignment: Alignment.centerLeft,
+                              margin: EdgeInsets.all(20),
+                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              height: 150,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(
+                                    25), //border corner radius
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey
+                                        .withOpacity(0.5), //color of shadow
+                                    spreadRadius: 1, //spread radius
+                                    blurRadius: 7, // blur radius
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.date_range,
+                                        color: Warna.htam,
+                                        size: 20.0,
+                                      ),
+                                      Text(
+                                        "ff",
+                                        // "  ${DateFormat.yMMMEd().format(DateTime.parse(data['date']))}",
+                                        // data!["tanggal"],
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: Warna.abuabu,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 15,
+                                  ),
+                                  Row(children: [
+                                    Text(
+                                      "Check In",
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                        color: Warna.htam,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 38,
+                                    ),
+                                    Text(
+                                      data['masuk']?['InLembur'] == null
+                                          ? "-"
+                                          : "${DateFormat.jms().format(DateTime.parse(data['masuk']['InLembur']))}",
+                                      // DateFormat("HH mm")
+                                      //     .format(data["date"].toDate()),
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                        color: Warna.abuabu,
+                                      ),
+                                    ),
+                                  ]),
+                                  SizedBox(
+                                    height: 7,
+                                  ),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        "Check out",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          color: Warna.htam,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 30,
+                                      ),
+                                      Text(
+                                        data['keluar']?['OutLembur'] == null
+                                            ? "-"
+                                            : "${DateFormat.jms().format(DateTime.parse(data['keluar']['OutLembur']))}",
+                                        // data["check_out"] != ""
+                                        //     ? DateFormat("HH mm")
+                                        //         .format(data["date"].toDate())
+                                        //     : "-",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          color: Warna.abuabu,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                          );
+                          //btasss
+                        },
+                      );
+                    }),
+                  )
+
+                  // batsss ko
                 ],
-              );
-            }
+              ),
+            );
 
-            return CircularProgressIndicator();
-
-            //batass
+            //Builderrr
           }),
     );
   }
-}
 
-Container ItemCard1(DocumentSnapshot? data) {
-  return Container(
-    alignment: Alignment.centerLeft,
-    margin: EdgeInsets.all(20),
-    padding: EdgeInsets.symmetric(horizontal: 20),
-    height: 150,
-    width: double.infinity,
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(25), //border corner radius
-      boxShadow: [
-        BoxShadow(
-          color: Colors.grey.withOpacity(0.5), //color of shadow
-          spreadRadius: 1, //spread radius
-          blurRadius: 7, // blur radius
-          offset: Offset(0, 2),
-        ),
-      ],
-    ),
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.max,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Row(
-          children: [
-            Icon(
-              Icons.date_range,
-              color: Warna.htam,
-              size: 20.0,
-            ),
-            Text(
-              data!["tanggal"],
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Warna.abuabu,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(
-          height: 15,
-        ),
-        Row(children: [
-          Text(
-            "Check In",
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: Warna.htam,
-            ),
-          ),
-          SizedBox(
-            width: 38,
-          ),
-          Text(
-            DateFormat("HH mm").format(data["check_in"].toDate()),
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: Warna.abuabu,
-            ),
-          ),
-        ]),
-        SizedBox(
-          height: 7,
-        ),
-        Row(
-          children: [
-            Text(
-              "Check out",
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: Warna.htam,
-              ),
-            ),
-            SizedBox(
-              width: 30,
-            ),
-            Text(
-              data["check_out"] != ""
-                  ? DateFormat("HH mm").format(data["check_out"].toDate())
-                  : "-",
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: Warna.abuabu,
-              ),
-            ),
-          ],
-        )
-      ],
-    ),
-  );
+  //dd
 }
