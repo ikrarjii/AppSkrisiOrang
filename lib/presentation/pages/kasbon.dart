@@ -40,20 +40,20 @@ class _KasbonState extends State<Kasbon> {
         backgroundColor: Warna.hijau2,
         actions: [
           Container(
-            margin: EdgeInsets.only(right: 20),
+            margin:const  EdgeInsets.only(right: 20),
             child: IconButton(
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => TambhKasbon()));
+                    MaterialPageRoute(builder: (context) => const TambhKasbon()));
               },
-              icon: Icon(
+              icon: const Icon(
                 Icons.add,
                 size: 30,
                 color: Colors.white,
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
         ],
@@ -64,12 +64,12 @@ class _KasbonState extends State<Kasbon> {
         ),
       ),
       body: Container(
-        margin: EdgeInsets.only(top: 20),
+        margin: const EdgeInsets.only(top: 20),
         //padding: EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           children: [
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -83,7 +83,7 @@ class _KasbonState extends State<Kasbon> {
                       ),
                       color: Warna.hijau2),
                   IconButton(
-                      icon: Icon(Icons.keyboard_arrow_down),
+                      icon: const Icon(Icons.keyboard_arrow_down),
                       color: Warna.hijau2,
                       onPressed: () {
                         _selectPeriod(context);
@@ -94,7 +94,7 @@ class _KasbonState extends State<Kasbon> {
             ),
             Flexible(
                 child: Container(
-              padding: EdgeInsets.only(bottom: 25),
+              padding: const EdgeInsets.only(bottom: 25),
               child: StreamBuilder<QuerySnapshot>(
                 stream: firestore
                     .collection("pengajuan")
@@ -105,7 +105,7 @@ class _KasbonState extends State<Kasbon> {
                     .snapshots(),
                 builder: (context, snapshot) {
                   return !snapshot.hasData
-                      ? Center(
+                      ? const Center(
                           child: CircularProgressIndicator(),
                         )
                       : ListView.builder(
@@ -143,8 +143,8 @@ class _KasbonState extends State<Kasbon> {
       String? tanggal}) {
     return Container(
       alignment: Alignment.centerLeft,
-      margin: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-      padding: EdgeInsets.symmetric(horizontal: 20),
+      margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       height: 160,
       width: double.infinity,
       decoration: BoxDecoration(
@@ -155,7 +155,7 @@ class _KasbonState extends State<Kasbon> {
             color: Colors.grey.withOpacity(0.5), //color of shadow
             spreadRadius: 1, //spread radius
             blurRadius: 7, // blur radius
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -173,7 +173,7 @@ class _KasbonState extends State<Kasbon> {
                     fontSize: 15,
                     color: Warna.htam),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 30,
               ),
               TextButton(
@@ -197,7 +197,7 @@ class _KasbonState extends State<Kasbon> {
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Row(
@@ -211,7 +211,7 @@ class _KasbonState extends State<Kasbon> {
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 15,
           ),
           Row(
@@ -221,7 +221,7 @@ class _KasbonState extends State<Kasbon> {
                 color: Warna.hijau2,
                 size: 20.0,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 15,
               ),
               Text(
@@ -233,7 +233,7 @@ class _KasbonState extends State<Kasbon> {
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 7,
           ),
           Row(
@@ -245,7 +245,7 @@ class _KasbonState extends State<Kasbon> {
                   color: Warna.htam,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 30,
               ),
               Text(

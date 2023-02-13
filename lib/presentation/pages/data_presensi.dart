@@ -1,8 +1,9 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_application_1/presentation/pages/Profil.dart';
+
 import 'package:flutter_application_1/presentation/pages/home.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,12 +11,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_application_1/Utils/Utils.dart';
 // import 'package:month_picker_dialog/month_picker_dialog.dart';
-import '../resources/gambar.dart';
+
 import '../resources/warna.dart';
 import '../widgets/ItemPresensi.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'my_page.dart';
 // import 'package:month_year_picker/month_year_picker.dart';
 
 class DataPresensi extends StatefulWidget {
@@ -29,22 +29,76 @@ class _DataPresensiState extends State<DataPresensi> {
   DateTime selectedPeriod = DateTime.now();
   bool show = false;
   File? image;
+  Map<String, dynamic> gaji = {
+    "gaji": 0,
+    "lembur": 0,
+    "bonus": 0,
+    "keterlambatan": 0,
+    "total": 0,
+    "nama": "",
+  };
 
-  Future<DateTime> _selectPeriod(BuildContext context) async {
+  Future<void> _selectPeriod(BuildContext context) async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final user = FirebaseAuth.instance.currentUser;
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String uid = auth.currentUser!.uid;
+
+    QuerySnapshot<Map<String, dynamic>> object = await firestore
+        .collection("users")
+        .doc(uid)
+        .collection('present')
+        .get();
+
+    log("okokk = $object");
+
+    List<Map<String, dynamic>> objectList =
+        object.docs.map((e) => e.data()).toList();
+
+    log("List nya = $objectList");
+
     final selected = await showDatePicker(
-        context: context,
-        initialDate: selectedPeriod,
-        firstDate: DateTime(2000),
-        lastDate: DateTime(2025));
-    if (selected != null && selected != selectedPeriod) {
-      setState(() {
-        selectedPeriod = selected;
-      });
-    }
-    return selectedPeriod;
-  }
+            context: context,
+            initialDate: selectedPeriod,
+            firstDate: DateTime(2000),
+            lastDate: DateTime(2025))
+        .then((selected) {
+      if (selected != null && selected != selectedPeriod) {
+        setState(() {
+          String selectedMonth =
+              DateFormat().add_MMM().format(selected).replaceAll("/", "-");
+          log("$selected");
 
-  Future<void> doSomeAsyncStuff() async {}
+          List<Map<String, dynamic>> absen = [];
+
+          objectList.forEach((e) {
+            DateTime waktu = DateTime.parse(e['date'].toString());
+
+            String userMonth =
+                DateFormat().add_MMM().format(waktu).replaceAll("/", "-");
+
+            if (userMonth == selectedMonth) {
+              absen.add(e);
+            }
+          });
+
+          selectedPeriod = selected;
+          gaji['gaji'] = 0;
+          gaji['lembur'] = 0;
+          gaji['keterlambatan'] = 0;
+          gaji['nama'] = "";
+
+          absen.forEach((e) {
+            gaji['gaji'] = gaji['gaji'] + e['gajiDay'];
+            gaji['lembur'] = gaji['lembur'] + e['waktuLembur'];
+            gaji['keterlambatan'] = gaji['keterlambatan'] + e['late'];
+            gaji['nama'] = e['nama'];
+          });
+        });
+      }
+    });
+    log(gaji['nama']);
+  }
 
   Future pikcImage() async {
     try {
@@ -84,32 +138,6 @@ class _DataPresensiState extends State<DataPresensi> {
           .putFile(image!);
       var downloadUrl = await snapshot.ref.getDownloadURL();
 
-      // final doc = FirebaseFirestore.instance.collection("pengajuan");
-      // final json = {
-      //   "email": user!.email,
-      //   // "created_at": DateTime.now(),
-      //   // "jenis": dropDownValue,
-      //   // "tanggal_mulai": selectedDate,
-      //   // "tanggal_selesai": selectedDate1,
-      //   // "keterangan": keteranganController.text.trim(),
-      //   // "status": "0",
-      //   "image": downloadUrl,
-      //   // "month": DateFormat("MMMM").format(DateTime.now()),
-      //   // "tipe_pengajuan": 'Izin',
-      //   // "biaya": "-",
-      //   // "tanggal": '-',
-      //   // "nama": nama
-      // };
-
-      // await doc.add(json);
-
-      // Utils.showSnackBar("Berhasil Tambah Izin.", Colors.green);
-      // keteranganController.clear();
-      // setState(() {
-
-      //   image = null;
-
-      // });
       Navigator.of(context, rootNavigator: true).pop('dialog');
       // navigatorKey.currentState!.pop();
     } on FirebaseAuthException catch (e) {
@@ -123,26 +151,15 @@ class _DataPresensiState extends State<DataPresensi> {
     String uid = auth.currentUser!.uid;
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-    // var tgl = DateFormat('yMMMM').format(selectedPeriod);
+    final collectionReference = FirebaseFirestore.instance
+        .collection("users")
+        .doc(uid)
+        .collection("present");
 
-    // yield* firestore
-    //     .collection("users")
-    //     .doc(uid)
-    //     .collection("present")
-    //     .where("bulan", isEqualTo: tgl)
-    //     .snapshots();
-    final collectionReference = FirebaseFirestore.instance.collection("users").doc(uid).collection("present");
-
-collectionReference.orderBy("date").get().then((QuerySnapshot snapshot) {
-  snapshot.docs.forEach((DocumentSnapshot document) {
-    print("ffffffffffff ${document}");
-  });
-});
-
-
+    collectionReference.orderBy("date").get().then((QuerySnapshot snapshot) {
+      snapshot.docs.forEach((DocumentSnapshot document) {});
+    });
   }
- 
-
 
   @override
   Widget build(BuildContext context) {
@@ -157,13 +174,11 @@ collectionReference.orderBy("date").get().then((QuerySnapshot snapshot) {
             .collection("users")
             .doc(uid)
             .collection("present")
-            .where("bulan", isEqualTo: tgl)
+            // .where("bulan", isEqualTo: tgl)
             .snapshots(),
         builder: (context, snapPresence) {
           if (snapPresence.hasData) {
-            return
-                // scrollDirection: Axis.vertical,
-                Column(
+            return Column(
               children: [
                 StreamBuilder<QuerySnapshot>(
                   stream: streamUser(),
@@ -176,15 +191,7 @@ collectionReference.orderBy("date").get().then((QuerySnapshot snapshot) {
                         Map<String, dynamic> data =
                             snapPresence.data!.docs[index].data();
 
-                        // totalGaji = ambil gaji yang bulan 1 lalu jumlahkan (tG)
-                        //total lembur (tL)
-                        //total bonus (tB)
-                        //mines keterlambatan (mK)
-
-                        //gaji bulan ini.bulan =  tG + tL + tb - mK
-
-                        return SingleChildScrollView(
-                            child: Container(
+                        return Container(
                           width: double.infinity,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -192,9 +199,7 @@ collectionReference.orderBy("date").get().then((QuerySnapshot snapshot) {
                             children: [
                               SizedBox(
                                 height: 250,
-                                child: Container(
-                                  child: home(),
-                                ),
+                                child: home(),
                               ),
                               Container(
                                 // margin: EdgeInsets.only(top: 10),
@@ -222,31 +227,26 @@ collectionReference.orderBy("date").get().then((QuerySnapshot snapshot) {
                                 ),
                               ),
                               ItemPresensi(
-                                text1: 'Gaji Pokok',
-                                text2: '0 Hari',
-                              ),
+                                  text1: 'Gaji Pokok',
+                                  text2: 'Rp. ${gaji['gaji']}'),
                               ItemPresensi(
                                 text1: 'Lembur',
-                                text2: '0 Hari',
+                                text2: 'Rp. ${gaji['lembur'] * 40000}',
                               ),
                               ItemPresensi(
-                                text1: 'Bonus',
-                                text2: '0 kali',
-                              ),
+                                  text1: 'Bonus',
+                                  text2: 'Rp. ${gaji['bonus']}'),
                               ItemPresensi(
-                                text1: 'Keterlambatan',
-                                text2: '0 Hari',
-                              ),
+                                  text1: 'Keterlambatan',
+                                  text2:
+                                      "Rp. ${gaji['keterlambatan'] * 100000}"),
                               ItemPresensi(
-                                text1: 'Gaji Bulan ini',
-                                text2: 'Rp.0',
-                              ),
+                                  text1: 'Gaji Bulan ini',
+                                  text2:
+                                      'Rp. ${gaji['gaji'] + gaji['lembur'] + gaji['bonus'] - gaji['keterlambatan']}'),
                             ],
                           ),
-                        )
-
-                            //lll
-                            );
+                        );
                         //btasss
                       },
                     );
@@ -258,6 +258,8 @@ collectionReference.orderBy("date").get().then((QuerySnapshot snapshot) {
                 // batsss ko
               ],
             );
+
+            //okok
           } else {
             return Expanded(
                 child: Center(

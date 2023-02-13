@@ -1,8 +1,10 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/presentation/pages/Profil.dart';
+import 'package:flutter_application_1/presentation/pages/services/update_profile.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -13,6 +15,7 @@ import '../resources/gambar.dart';
 import '../resources/warna.dart';
 import '../widgets/ItemPresensi.dart';
 import 'package:image_picker/image_picker.dart';
+
 // import 'package:month_year_picker/month_year_picker.dart';
 
 class home extends StatefulWidget {
@@ -26,22 +29,6 @@ class _homeState extends State<home> {
   DateTime selectedPeriod = DateTime.now();
   bool show = false;
   File? image;
-
-  Future<DateTime> _selectPeriod(BuildContext context) async {
-    final selected = await showDatePicker(
-        context: context,
-        initialDate: selectedPeriod,
-        firstDate: DateTime(2000),
-        lastDate: DateTime(2025));
-    if (selected != null && selected != selectedPeriod) {
-      setState(() {
-        selectedPeriod = selected;
-      });
-    }
-    return selectedPeriod;
-  }
-
-  Future<void> doSomeAsyncStuff() async {}
 
   Future pikcImage() async {
     try {
@@ -81,32 +68,6 @@ class _homeState extends State<home> {
           .putFile(image!);
       var downloadUrl = await snapshot.ref.getDownloadURL();
 
-      // final doc = FirebaseFirestore.instance.collection("pengajuan");
-      // final json = {
-      //   "email": user!.email,
-      //   // "created_at": DateTime.now(),
-      //   // "jenis": dropDownValue,
-      //   // "tanggal_mulai": selectedDate,
-      //   // "tanggal_selesai": selectedDate1,
-      //   // "keterangan": keteranganController.text.trim(),
-      //   // "status": "0",
-      //   "image": downloadUrl,
-      //   // "month": DateFormat("MMMM").format(DateTime.now()),
-      //   // "tipe_pengajuan": 'Izin',
-      //   // "biaya": "-",
-      //   // "tanggal": '-',
-      //   // "nama": nama
-      // };
-
-      // await doc.add(json);
-
-      // Utils.showSnackBar("Berhasil Tambah Izin.", Colors.green);
-      // keteranganController.clear();
-      // setState(() {
-
-      //   image = null;
-
-      // });
       Navigator.of(context, rootNavigator: true).pop('dialog');
       // navigatorKey.currentState!.pop();
     } on FirebaseAuthException catch (e) {
@@ -166,19 +127,24 @@ class _homeState extends State<home> {
                     children: [
                       CircleAvatar(
                         radius: 45,
-                        backgroundColor: Colors.white,
-                        backgroundImage: AssetImage(Gambar.logouin),
+                        backgroundColor: Colors.amberAccent,
+                        // backgroundImage: AssetImage(Gambar.logouin),
                       ),
                       image != null
                           ? InkWell(
                               onTap: () {
                                 pikcImage();
                               },
-                              child: Image.file(
-                                image!,
-                                height: 150,
-                                width: 150,
-                                fit: BoxFit.cover,
+                              child: ClipOval(
+                                child: CircleAvatar(
+                                  radius: 45,
+                                  child: Image.file(
+                                    image!,
+                                    height: 150,
+                                    width: 150,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
                               ))
                           : Container(
                               padding: EdgeInsets.only(top: 50, left: 60),
@@ -191,14 +157,11 @@ class _homeState extends State<home> {
                                   }),
                             ),
                       // Positioned(
-
                       //     bottom: 0,
                       //     right: 20,
                       //     child: InkWell(
                       //       child: Icon(Icons.camera_alt),
-                      //       onTap: () {
-
-                      //       },
+                      //       onTap: () {},
                       //     )),
                     ],
                   ),

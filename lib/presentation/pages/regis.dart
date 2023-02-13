@@ -157,6 +157,19 @@ class RegisState extends State<Regis> {
 
       await docUser.set(json);
 
+      // final doc = FirebaseFirestore.instance
+      //     .collection("users")
+      //     .doc()
+      //     .collection("present")
+      //     .doc();
+
+      // final jsonn = {
+      //   "email": emailController.text.trim(),
+      //   "nama": namaController.text.trim(),
+      // };
+
+      // await doc.set(jsonn);
+
       Utils.showSnackBar("Berhasil Daftar.", Colors.green);
       navigatorKey.currentState!.popUntil((route) => route.isFirst);
     } on FirebaseAuthException catch (e) {

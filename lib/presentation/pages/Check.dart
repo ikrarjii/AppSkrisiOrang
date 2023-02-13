@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +10,7 @@ import 'package:flutter_application_1/presentation/pages/Scan.dart';
 import 'package:flutter_application_1/presentation/pages/data_presensi.dart';
 import 'package:flutter_application_1/presentation/pages/my_page.dart';
 import 'package:flutter_application_1/presentation/resources/warna.dart';
+import 'package:flutter_application_1/presentation/widgets/attendance_card.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import '../resources/gambar.dart';
 import 'package:qrscan/qrscan.dart' as scanner;
@@ -23,12 +26,7 @@ class CheckPage extends StatefulWidget {
 class _CheckPageState extends State<CheckPage> {
   Future<void> scanQR() async {
     String barcodeScanRes;
-    // int _StatusGaji = 123456;
-    // Platform messages may fail, so we use a try/catch PlatformException.
 
-    // final user = await FirebaseAuth.instance.currentUser;
-
-    // String uid = await user!.uid;'
     FirebaseAuth auth = FirebaseAuth.instance;
     String uid = auth.currentUser!.uid;
 
@@ -37,51 +35,53 @@ class _CheckPageState extends State<CheckPage> {
     CollectionReference<Map<String, dynamic>> cPresent =
         await firestore.collection("users").doc(uid).collection("present");
 
-    // print("fffffffff = ${usr.get()}");
-    // Map<String, dynamic> data = cPresent.doc(uid).collection("users");
+    DocumentSnapshot<Map<String, dynamic>> Gaji =
+        await firestore.collection("users").doc(uid).get();
 
-    // final data = userss.get();
+    log(Gaji.data().toString());
 
     QuerySnapshot<Map<String, dynamic>> snapPrensent = await cPresent.get();
-    // print("ffff");
-    // print("masuk = ${snapPrensent.docs.length}");
 
-    // print(uid);
     DateTime now = DateTime.now();
-    String todayDocID =
-        DateFormat().add_yMMMM().format(now).replaceAll("/", "-");
+    String todayDocID = DateFormat().add_yMd().format(now).replaceAll("/", "-");
 
-    String _status = "";
-
-    int terLambat;
     int lembur = 50000;
-
-    if (now.hour >= 6 && now.hour <= 12) {
-      _status = "Normal";
-    } else if (now.hour >= 8 && now.hour <= 5) {
-      _status = "terlambat";
-    }
+    // Utils.showSnackBar("Maaf, Waktu Absen Telah Habis.", Colors.green);
+    // if (now.hour >= 8 && now.hour <= 4) {
 
     if (snapPrensent.docs.length == 0) {
       barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
           '#ff6666', 'Cancel', true, ScanMode.QR);
       await scanner.scan();
 
-      await cPresent.doc(todayDocID).set({
-        "bulan": 0,
-        "gajiDay": 0,
-        "date": now.toIso8601String(),
-        "masuk": {
+      if (now.hour >= 9 && now.hour <= 10) {
+        print(now);
+        log("terlambat");
+        await cPresent.doc(todayDocID).set({
           "date": now.toIso8601String(),
+          "masuk": {
+            "date": now.toIso8601String(),
+            "late": 100,
 
-          // "user": user!.email,
-        }
-      });
+            // "user": user!.email,
+          }
+        });
+      } else {
+        log("terlambat");
+        log("tidak terlambat");
+        await cPresent.doc(todayDocID).set({
+          "date": now.toIso8601String(),
+          "masuk": {
+            "date": now.toIso8601String(),
+            "late": 0,
+
+            // "user": user!.email,
+          }
+        });
+      }
     } else {
       DocumentSnapshot<Map<String, dynamic>> absenn =
           await cPresent.doc(todayDocID).get();
-
-      print(absenn.exists);
 
       if (absenn.exists == true) {
         Map<String, dynamic>? dataPresentTod = absenn.data();
@@ -101,7 +101,6 @@ class _CheckPageState extends State<CheckPage> {
             "gajiDay": _gajiDay,
             "keluar": {
               "date": now.toIso8601String(),
-              "gajiDay": gajiDay,
             }
           });
         }
@@ -114,7 +113,6 @@ class _CheckPageState extends State<CheckPage> {
           "date": now.toIso8601String(),
           "masuk": {
             "date": now.toIso8601String(),
-            "status": _status,
           }
         });
       }
@@ -127,6 +125,8 @@ class _CheckPageState extends State<CheckPage> {
     //     child: CircularProgressIndicator(),
     //   ),
     // );
+
+    // }
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> streamUser() async* {
@@ -269,7 +269,7 @@ class _CheckPageState extends State<CheckPage> {
                     builder: ((context, snapPresent) {
                       if (snapPresence.data?.docs.length == 0 ||
                           snapPresence.data == null) {
-                        return SizedBox(
+                        return const SizedBox(
                           height: 400,
                           child: Center(
                             child:
@@ -281,6 +281,7 @@ class _CheckPageState extends State<CheckPage> {
                       return ListView.builder(
                         shrinkWrap: true,
                         scrollDirection: Axis.vertical,
+                        physics: const NeverScrollableScrollPhysics(),
                         itemCount: snapPresence.data!.docs.length,
                         itemBuilder: (context, index) {
                           Map<String, dynamic> data =
@@ -293,114 +294,17 @@ class _CheckPageState extends State<CheckPage> {
 
                           //gaji bulan ini.bulan =  tG + tL + tb - mK
 
-                          return SingleChildScrollView(
-                            child: Container(
-                              alignment: Alignment.centerLeft,
-                              margin: EdgeInsets.all(20),
-                              padding: EdgeInsets.symmetric(horizontal: 20),
-                              height: 150,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(
-                                    25), //border corner radius
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey
-                                        .withOpacity(0.5), //color of shadow
-                                    spreadRadius: 1, //spread radius
-                                    blurRadius: 7, // blur radius
-                                    offset: Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.max,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.date_range,
-                                        color: Warna.htam,
-                                        size: 20.0,
-                                      ),
-                                      Text(
-                                        "  ${DateFormat.yMMMEd().format(DateTime.parse(data['date']))}",
-                                        // data!["tanggal"],
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          color: Warna.abuabu,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 15,
-                                  ),
-                                  Row(children: [
-                                    Text(
-                                      "Check In",
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w600,
-                                        color: Warna.htam,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 38,
-                                    ),
-                                    Text(
-                                      data['masuk']?['date'] == null
-                                          ? "-"
-                                          : "${DateFormat.jms().format(DateTime.parse(data['masuk']['date']))}",
-                                      // DateFormat("HH mm")
-                                      //     .format(data["date"].toDate()),
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w600,
-                                        color: Warna.abuabu,
-                                      ),
-                                    ),
-                                  ]),
-                                  SizedBox(
-                                    height: 7,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        "Check out",
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w600,
-                                          color: Warna.htam,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 30,
-                                      ),
-                                      Text(
-                                        data['keluar']?['date'] == null
-                                            ? "-"
-                                            : "${DateFormat.jms().format(DateTime.parse(data['keluar']['date']))}",
-                                        // data["check_out"] != ""
-                                        //     ? DateFormat("HH mm")
-                                        //         .format(data["date"].toDate())
-                                        //     : "-",
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w600,
-                                          color: Warna.abuabu,
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
+                          return AttendanceCard(
+                            date:
+                                "${DateFormat.yMMMEd().format(DateTime.parse(data['date'].toString()))}",
+                            checkIn: data['masuk']?['date'] == null
+                                ? "-"
+                                : "${DateFormat.jms().format(DateTime.parse(data['masuk']['date'].toString()))}",
+                            checkout: data['keluar']?['date'] == null
+                                ? "-"
+                                : "${DateFormat.jms().format(DateTime.parse(data['keluar']['date'].toString()))}",
                           );
+
                           //btasss
                         },
                       );

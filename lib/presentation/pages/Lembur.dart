@@ -293,31 +293,30 @@ class _CheckPageState extends State<Lembur> {
                                 child: Container(),
                               ),
                               Container(
-                                margin: EdgeInsets.symmetric(vertical: 20),
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 20),
                                 width: double.infinity,
                                 padding: EdgeInsets.only(),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    Container(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          IconButton(
-                                              icon: Icon(Icons.arrow_back),
-                                              color: Warna.putih,
-                                              onPressed: () {
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            MyPages()));
-                                              }),
-                                        ],
-                                      ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        IconButton(
+                                            icon: const Icon(Icons.arrow_back),
+                                            color: Warna.putih,
+                                            onPressed: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const MyPages()));
+                                            }),
+                                      ],
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 20,
                                     ),
                                     Title(
@@ -331,7 +330,7 @@ class _CheckPageState extends State<Lembur> {
                                         ),
                                       ),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 10,
                                     ),
                                     Title(
@@ -349,7 +348,7 @@ class _CheckPageState extends State<Lembur> {
                                   ],
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 2,
                               ),
                               Container(

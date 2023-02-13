@@ -24,7 +24,7 @@ class MyPagesState extends State<MyPages> {
   int _selectedIndex = 0;
   final List<Widget> _widgetOptions = <Widget>[
     DataPresensi(),
-    Check_lemburPage(),
+    check_lemburPage(),
     Kasbon(),
     Izin()
   ];

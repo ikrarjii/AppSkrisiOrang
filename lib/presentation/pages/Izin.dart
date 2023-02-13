@@ -40,20 +40,20 @@ class _IzinState extends State<Izin> {
         backgroundColor: Warna.hijau2,
         actions: [
           Container(
-            margin: EdgeInsets.only(right: 20),
+            margin: const EdgeInsets.only(right: 20),
             child: IconButton(
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => TambhIzin()));
+                    MaterialPageRoute(builder: (context) => const TambhIzin()));
               },
-              icon: Icon(
+              icon: const Icon(
                 Icons.add,
                 size: 30,
                 color: Colors.white,
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
         ],
@@ -64,7 +64,7 @@ class _IzinState extends State<Izin> {
         ),
       ),
       body: Container(
-        margin: EdgeInsets.only(top: 20),
+        margin: const EdgeInsets.only(top: 20),
         // padding: EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           children: [
@@ -83,7 +83,7 @@ class _IzinState extends State<Izin> {
                       ),
                       color: Warna.hijau2),
                   IconButton(
-                      icon: Icon(Icons.keyboard_arrow_down),
+                      icon: const Icon(Icons.keyboard_arrow_down),
                       color: Warna.hijau2,
                       onPressed: () {
                         _selectPeriod(context);
@@ -94,7 +94,7 @@ class _IzinState extends State<Izin> {
             ),
             Flexible(
                 child: Container(
-              padding: EdgeInsets.only(bottom: 25),
+              padding: const EdgeInsets.only(bottom: 25),
               child: StreamBuilder<QuerySnapshot>(
                 stream: firestore
                     .collection("pengajuan")
@@ -105,7 +105,7 @@ class _IzinState extends State<Izin> {
                     .snapshots(),
                 builder: (context, snapshot) {
                   return !snapshot.hasData
-                      ? Center(
+                      ? const Center(
                           child: CircularProgressIndicator(),
                         )
                       : ListView.builder(
@@ -147,8 +147,8 @@ class _IzinState extends State<Izin> {
       String? selesai}) {
     return Container(
       alignment: Alignment.centerLeft,
-      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-      padding: EdgeInsets.symmetric(horizontal: 10),
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       height: 160,
       width: double.infinity,
       decoration: BoxDecoration(
@@ -159,7 +159,7 @@ class _IzinState extends State<Izin> {
             color: Colors.grey.withOpacity(0.5), //color of shadow
             spreadRadius: 1, //spread radius
             blurRadius: 7, // blur radius
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -177,7 +177,7 @@ class _IzinState extends State<Izin> {
                     fontSize: 15,
                     color: Warna.htam),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 30,
               ),
               TextButton(
@@ -201,7 +201,7 @@ class _IzinState extends State<Izin> {
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Row(
@@ -215,7 +215,7 @@ class _IzinState extends State<Izin> {
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 15,
           ),
           Row(
@@ -234,7 +234,7 @@ class _IzinState extends State<Izin> {
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 7,
           ),
           Row(
@@ -246,7 +246,7 @@ class _IzinState extends State<Izin> {
                   color: Warna.htam,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 30,
               ),
               Text(

@@ -1,11 +1,9 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Utils/Utils.dart';
-import 'package:flutter_application_1/presentation/pages/Lembur.dart';
-import 'package:flutter_application_1/presentation/pages/Scan.dart';
-import 'package:flutter_application_1/presentation/pages/data_presensi.dart';
 import 'package:flutter_application_1/presentation/pages/my_page.dart';
 import 'package:flutter_application_1/presentation/resources/warna.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
@@ -13,22 +11,18 @@ import '../resources/gambar.dart';
 import 'package:qrscan/qrscan.dart' as scanner;
 import 'package:intl/intl.dart';
 
-class Check_lemburPage extends StatefulWidget {
-  const Check_lemburPage({Key? key}) : super(key: key);
+class check_lemburPage extends StatefulWidget {
+  const check_lemburPage({Key? key}) : super(key: key);
 
   @override
-  State<Check_lemburPage> createState() => _Check_lemburPageState();
+  State<check_lemburPage> createState() => _check_lemburPageState();
 }
 
-class _Check_lemburPageState extends State<Check_lemburPage> {
+class _check_lemburPageState extends State<check_lemburPage> {
   Future<void> scanQR() async {
     String barcodeScanRes;
-    // int _StatusGaji = 123456;
-    // Platform messages may fail, so we use a try/catch PlatformException.
+    int lembur = 0;
 
-    // final user = await FirebaseAuth.instance.currentUser;
-
-    // String uid = await user!.uid;'
     FirebaseAuth auth = FirebaseAuth.instance;
     String uid = auth.currentUser!.uid;
 
@@ -37,85 +31,57 @@ class _Check_lemburPageState extends State<Check_lemburPage> {
     CollectionReference<Map<String, dynamic>> cPresent =
         await firestore.collection("users").doc(uid).collection("present");
 
-    // print("fffffffff = ${usr.get()}");
-    // Map<String, dynamic> data = cPresent.doc(uid).collection("users");
-
-    // final data = userss.get();
-
     QuerySnapshot<Map<String, dynamic>> snapPrensent = await cPresent.get();
-    // print("ffff");
-    // print("masuk = ${snapPrensent.docs.length}");
-
-    // print(uid);
     DateTime now = DateTime.now();
-    String todayDocID =
-        DateFormat().add_yMMMM().format(now).replaceAll("/", "-");
+    String todayDocID = DateFormat().add_yMd().format(now).replaceAll("/", "-");
 
-    String _status = "";
+    DateTime jamm = DateTime.now();
+    log("jamnya ${jamm.hour}");
 
-    int terLambat;
-    int lembur = 50000;
+    String jam = DateFormat().add_yMd().format(jamm).replaceAll("/", "-");
 
-    if (now.hour >= 6 && now.hour <= 12) {
-      _status = "Normal";
-    } else if (now.hour >= 8 && now.hour <= 5) {
-      _status = "terlambat";
-    }
+    DocumentSnapshot<Map<String, dynamic>> absenn =
+        await cPresent.doc(todayDocID).get();
+    Map<String, dynamic>? dataPresentTod = absenn.data();
 
-    if (snapPrensent.docs.length >= 0) {
-      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-          '#ff6666', 'Cancel', true, ScanMode.QR);
-      await scanner.scan();
-
-      await cPresent.doc(todayDocID).update({
-        "LemburStar": {
-          "date": now.toIso8601String(),
-        }
-      });
-    } else {
-      DocumentSnapshot<Map<String, dynamic>> absenn =
-          await cPresent.doc(todayDocID).get();
-
-      print(absenn.exists);
-
-      if (absenn.exists == true) {
-        Map<String, dynamic>? dataPresentTod = absenn.data();
-
-        if (dataPresentTod?["LemburOut"] != null) {
-          Utils.showSnackBar(
-              "Sukses Sudah Absen Masuk && Keluar.", Colors.green);
-        } else {
-          //absen Keluar
-          barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-              '#ff6666', 'Cancel', true, ScanMode.QR);
-          await scanner.scan();
-
-          await cPresent.doc(todayDocID).update({
-            "lemburOut": {
-              "date": now.toIso8601String(),
-            }
-          });
-        }
-      } else {
-        //masuk
+    if (jamm.hour >= 19 && jamm.hour <= 00) {
+      if (dataPresentTod?["OutLembur"] != null &&
+          dataPresentTod?["starLembur"] != null) {
+        Utils.showSnackBar("Sukses Sudah Absen Masuk && Keluar.", Colors.green);
+      } else if (dataPresentTod?["starLembur"] == null) {
         barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
             '#ff6666', 'Cancel', true, ScanMode.QR);
         await scanner.scan();
         await cPresent.doc(todayDocID).update({
-          "LemburStar": {
-            "date": now.toIso8601String(),
+          "starLembur": {
+            "jamSLembur": jamm.toIso8601String(),
+          }
+        });
+      } else {
+        barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+            '#ff6666', 'Cancel', true, ScanMode.QR);
+        await scanner.scan();
+        await cPresent.doc(todayDocID).update({
+          "OutLembur": {
+            "JamOLembur": jamm.toIso8601String(),
           }
         });
       }
+    } else {
+      Utils.showSnackBar("Maaf Anda Belum Bisa Absen Lembur.", Colors.green);
     }
 
-    // showDialog(
-    //   context: context,
-    //   barrierDismissible: false,
-    //   builder: (context) => Center(
-    //     child: CircularProgressIndicator(),
-    //   ),
-    // );
+    var jamMulai = DateTime.parse(dataPresentTod!["starLembur"]["jamSLembur"]);
+
+    var jamAkhir = DateTime.parse(dataPresentTod["OutLembur"]["JamOLembur"]);
+
+    var jamLembur = jamAkhir.difference(jamMulai).inHours.round();
+
+    lembur = jamLembur;
+
+    await cPresent.doc(todayDocID).update({
+      "waktuLembur": lembur,
+    });
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> streamUser() async* {
@@ -167,7 +133,7 @@ class _Check_lemburPageState extends State<Check_lemburPage> {
                               Container(
                                 margin: EdgeInsets.symmetric(vertical: 20),
                                 width: double.infinity,
-                                padding: EdgeInsets.only(),
+                                padding: const EdgeInsets.only(),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
@@ -189,7 +155,7 @@ class _Check_lemburPageState extends State<Check_lemburPage> {
                                         ],
                                       ),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 20,
                                     ),
                                     Title(
@@ -203,7 +169,7 @@ class _Check_lemburPageState extends State<Check_lemburPage> {
                                         ),
                                       ),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 10,
                                     ),
                                     Title(
@@ -221,7 +187,7 @@ class _Check_lemburPageState extends State<Check_lemburPage> {
                                   ],
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 2,
                               ),
                               Container(
@@ -234,9 +200,9 @@ class _Check_lemburPageState extends State<Check_lemburPage> {
                                       padding:
                                           EdgeInsets.symmetric(vertical: 20),
                                     ),
-                                    child: Text("Check In"),
-                                    onPressed: () {
-                                      scanQR();
+                                    child: const Text("Check In"),
+                                    onPressed: () async {
+                                      await scanQR();
                                       // Navigator.push(context,
                                       //     MaterialPageRoute(builder: (context) => Csan()));
                                     },
@@ -249,7 +215,7 @@ class _Check_lemburPageState extends State<Check_lemburPage> {
 
                         ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
 
@@ -260,7 +226,7 @@ class _Check_lemburPageState extends State<Check_lemburPage> {
                           snapPresence.data == null) {
                         return SizedBox(
                           height: 400,
-                          child: Center(
+                          child: const Center(
                             child:
                                 Text("Maaf, History absen anda belum ada!!!"),
                           ),
@@ -270,69 +236,91 @@ class _Check_lemburPageState extends State<Check_lemburPage> {
                       return ListView.builder(
                         shrinkWrap: true,
                         scrollDirection: Axis.vertical,
+                        physics: NeverScrollableScrollPhysics(),
                         itemCount: snapPresence.data!.docs.length,
                         itemBuilder: (context, index) {
                           Map<String, dynamic> data =
                               snapPresence.data!.docs[index].data();
 
-                          // totalGaji = ambil gaji yang bulan 1 lalu jumlahkan (tG)
-                          //total lembur (tL)
-                          //total bonus (tB)
-                          //mines keterlambatan (mK)
-
-                          //gaji bulan ini.bulan =  tG + tL + tb - mK
-
-                          return SingleChildScrollView(
-                            child: Container(
-                              alignment: Alignment.centerLeft,
-                              margin: EdgeInsets.all(20),
-                              padding: EdgeInsets.symmetric(horizontal: 20),
-                              height: 150,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(
-                                    25), //border corner radius
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey
-                                        .withOpacity(0.5), //color of shadow
-                                    spreadRadius: 1, //spread radius
-                                    blurRadius: 7, // blur radius
-                                    offset: Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.max,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.date_range,
-                                        color: Warna.htam,
-                                        size: 20.0,
+                          return Container(
+                            alignment: Alignment.centerLeft,
+                            margin: const EdgeInsets.all(20),
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            height: 150,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(
+                                  25), //border corner radius
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey
+                                      .withOpacity(0.5), //color of shadow
+                                  spreadRadius: 1, //spread radius
+                                  blurRadius: 7, // blur radius
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.date_range,
+                                      color: Warna.htam,
+                                      size: 20.0,
+                                    ),
+                                    Text(
+                                      "${DateFormat.yMMMEd().format(DateTime.parse(data['date'].toString()))}",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Warna.abuabu,
                                       ),
-                                      Text(
-                                        "ff",
-                                        // "  ${DateFormat.yMMMEd().format(DateTime.parse(data['date']))}",
-                                        // data!["tanggal"],
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          color: Warna.abuabu,
-                                        ),
-                                      ),
-                                    ],
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 15,
+                                ),
+                                Row(children: [
+                                  Text(
+                                    "Check In",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      color: Warna.htam,
+                                    ),
                                   ),
                                   SizedBox(
-                                    height: 15,
+                                    width: 38,
                                   ),
-                                  Row(children: [
+                                  Text(
+                                    data['masuk']?['date'] == null
+                                        ? "-"
+                                        : "${DateFormat.jms().format(DateTime.parse(data['masuk']['date'].toString()))}",
+                                    // data["check_out"] != ""
+                                    //     ? DateFormat("HH mm")
+                                    //         .format(data["date"].toDate())
+                                    //     : "-",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      color: Warna.abuabu,
+                                    ),
+                                  ),
+                                ]),
+                                SizedBox(
+                                  height: 7,
+                                ),
+                                Row(
+                                  children: [
                                     Text(
-                                      "Check In",
+                                      "Check out",
                                       style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w600,
@@ -340,55 +328,25 @@ class _Check_lemburPageState extends State<Check_lemburPage> {
                                       ),
                                     ),
                                     SizedBox(
-                                      width: 38,
+                                      width: 30,
                                     ),
                                     Text(
-                                      data['masuk']?['InLembur'] == null
+                                      data['keluar']?['date'] == null
                                           ? "-"
-                                          : "${DateFormat.jms().format(DateTime.parse(data['masuk']['InLembur']))}",
-                                      // DateFormat("HH mm")
-                                      //     .format(data["date"].toDate()),
+                                          : "${DateFormat.jms().format(DateTime.parse(data['keluar']['date'].toString()))}",
+                                      // data["check_out"] != ""
+                                      //     ? DateFormat("HH mm")
+                                      //         .format(data["date"].toDate())
+                                      //     : "-",
                                       style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w600,
                                         color: Warna.abuabu,
                                       ),
                                     ),
-                                  ]),
-                                  SizedBox(
-                                    height: 7,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        "Check out",
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w600,
-                                          color: Warna.htam,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 30,
-                                      ),
-                                      Text(
-                                        data['keluar']?['OutLembur'] == null
-                                            ? "-"
-                                            : "${DateFormat.jms().format(DateTime.parse(data['keluar']['OutLembur']))}",
-                                        // data["check_out"] != ""
-                                        //     ? DateFormat("HH mm")
-                                        //         .format(data["date"].toDate())
-                                        //     : "-",
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w600,
-                                          color: Warna.abuabu,
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
+                                  ],
+                                )
+                              ],
                             ),
                           );
                           //btasss

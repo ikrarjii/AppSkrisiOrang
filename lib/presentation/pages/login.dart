@@ -34,7 +34,7 @@ class _LoginState extends State<Login> {
               ),
               Container(
                 width: double.infinity,
-                padding: EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
                   "Welcome",
                   textAlign: TextAlign.left,
@@ -44,21 +44,21 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   children: [
                     Container(
                       width: double.infinity,
-                      child: Text(
+                      child: const Text(
                         "Email",
                         textAlign: TextAlign.left,
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 8,
                     ),
                     FormCustom(
@@ -68,7 +68,7 @@ class _LoginState extends State<Login> {
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               Container(
@@ -77,12 +77,12 @@ class _LoginState extends State<Login> {
                   children: [
                     Container(
                       width: double.infinity,
-                      child: Text(
+                      child: const Text(
                         "Password",
                         textAlign: TextAlign.left,
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 8,
                     ),
                     FormCustom(
@@ -92,7 +92,7 @@ class _LoginState extends State<Login> {
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 8,
               ),
               Container(
@@ -100,12 +100,12 @@ class _LoginState extends State<Login> {
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  child: Text("Lupa Password ?"),
+                  child: const Text("Lupa Password ?"),
                   style: TextButton.styleFrom(primary: Warna.borderside),
                   onPressed: () {},
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.all(20),
@@ -114,13 +114,13 @@ class _LoginState extends State<Login> {
                     primary: Warna.hijau2,
                     padding: EdgeInsets.symmetric(vertical: 20),
                   ),
-                  child: Text("Masuk"),
+                  child: const Text("Masuk"),
                   onPressed: () {
                     signIn();
                   },
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(horizontal: 20),
@@ -170,7 +170,7 @@ class _LoginState extends State<Login> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => Center(
+        builder: (context) => const Center(
           child: CircularProgressIndicator(),
         ),
       );
