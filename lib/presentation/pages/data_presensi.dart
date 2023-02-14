@@ -186,7 +186,7 @@ class _DataPresensiState extends State<DataPresensi> {
                     return ListView.builder(
                       shrinkWrap: true,
                       scrollDirection: Axis.vertical,
-                      itemCount: snapPresence.data!.docs.length,
+                      itemCount: 1,
                       itemBuilder: (context, index) {
                         Map<String, dynamic> data =
                             snapPresence.data!.docs[index].data();
