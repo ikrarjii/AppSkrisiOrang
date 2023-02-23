@@ -1,5 +1,6 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
-import '../resources/warna.dart';
 
 class ItemPresensi extends StatelessWidget {
   final String text1;
@@ -13,17 +14,17 @@ class ItemPresensi extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: 20),
-      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-      decoration: BoxDecoration(
+      margin: const EdgeInsets.only(top: 20),
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+      decoration: const BoxDecoration(
           border: Border(
               top: BorderSide(
                   width: 2, color: Color.fromARGB(255, 129, 129, 129)))),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(this.text1),
-          Text(this.text2),
+          Text(text1),
+          Text(text2),
         ],
       ),
     );

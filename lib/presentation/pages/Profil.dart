@@ -1,17 +1,15 @@
+// ignore_for_file: camel_case_types, avoid_print, use_build_context_synchronously, unused_local_variable, non_constant_identifier_names, file_names
+
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/main.dart';
-import 'package:flutter_application_1/presentation/pages/Tmbh_Izin.dart';
 import 'package:flutter_application_1/Utils/Utils.dart';
 import 'package:intl/intl.dart';
 import '../widgets/formcuxtom.dart';
 import 'package:flutter_application_1/presentation/pages/login.dart';
 import 'package:flutter_application_1/presentation/resources/warna.dart';
-
-import '../resources/gambar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
 
@@ -51,18 +49,17 @@ class _profilState extends State<Profil> {
 
       final imgTmp = File(image.path);
       setState(() => this.image = imgTmp);
-    } on PlatformException catch (e) {
+    } on PlatformException {
       print("failed pick image.");
     }
   }
 
   Future sendData() async {
-    final user = FirebaseAuth.instance.currentUser;
 
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Center(
+      builder: (context) => const Center(
         child: CircularProgressIndicator(),
       ),
     );
@@ -101,8 +98,8 @@ class _profilState extends State<Profil> {
         backgroundColor: Warna.hijau2,
         actions: [
           Container(
-            margin: EdgeInsets.all(13),
-            padding: EdgeInsets.symmetric(horizontal: 139),
+            margin: const EdgeInsets.all(13),
+            padding: const EdgeInsets.symmetric(horizontal: 139),
             child: Text(
               "Profil",
               style: TextStyle(
@@ -115,7 +112,7 @@ class _profilState extends State<Profil> {
         ],
       ),
       body: Container(
-        padding: EdgeInsets.only(bottom: 5),
+        padding: const EdgeInsets.only(bottom: 5),
         child: StreamBuilder<QuerySnapshot>(
           stream: firestore
               .collection("users")
@@ -123,7 +120,7 @@ class _profilState extends State<Profil> {
               .snapshots(),
           builder: (context, snapshot) {
             return !snapshot.hasData
-                ? Center(
+                ? const Center(
                     child: CircularProgressIndicator(),
                   )
                 : ListView.builder(
@@ -156,7 +153,7 @@ class _profilState extends State<Profil> {
       String? no_hp,
       String? no_rekening}) {
     return Container(
-      padding: EdgeInsets.only(right: 6, left: 6),
+      padding: const EdgeInsets.only(right: 6, left: 6),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -168,14 +165,14 @@ class _profilState extends State<Profil> {
               color: Warna.htam,
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
           FormCustom(
             text: nama ?? "",
             controller: _nama,
           ),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
           Text(
@@ -185,14 +182,14 @@ class _profilState extends State<Profil> {
               color: Warna.htam,
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
           FormCustom(
             text: email ?? "",
             controller: _email,
           ),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
           Text(
@@ -202,14 +199,14 @@ class _profilState extends State<Profil> {
               color: Warna.htam,
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
           FormCustom(
             text: alamat ?? "",
             controller: _alamat,
           ),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
           Text(
@@ -219,14 +216,14 @@ class _profilState extends State<Profil> {
               color: Warna.htam,
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
           FormCustom(
             text: no_hp ?? "",
             controller: _noHp,
           ),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
           Text(
@@ -236,26 +233,26 @@ class _profilState extends State<Profil> {
               color: Warna.htam,
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
           FormCustom(
             text: no_rekening ?? "",
             controller: _noRek,
           ),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
           Container(
-            margin: EdgeInsets.symmetric(vertical: 5),
+            margin: const EdgeInsets.symmetric(vertical: 5),
             width: double.infinity,
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: Warna.hijau2,
-                padding: EdgeInsets.symmetric(vertical: 17),
+                backgroundColor: Warna.hijau2,
+                padding: const EdgeInsets.symmetric(vertical: 17),
               ),
-              child: Text("Update"),
+              child: const Text("Update"),
               onPressed: () {
                 DateTime now = DateTime.now();
                 String todayDocID =
@@ -272,19 +269,19 @@ class _profilState extends State<Profil> {
             ),
           ),
           Container(
-            margin: EdgeInsets.symmetric(vertical: 5),
+            margin: const EdgeInsets.symmetric(vertical: 5),
             width: double.infinity,
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: Warna.mrah,
-                padding: EdgeInsets.symmetric(vertical: 17),
+                backgroundColor: Warna.mrah,
+                padding: const EdgeInsets.symmetric(vertical: 17),
               ),
-              child: Text("Logout"),
+              child: const Text("Logout"),
               onPressed: () {
                 FirebaseAuth.instance.signOut();
                 Navigator.pushReplacement(
-                    context, MaterialPageRoute(builder: (context) => Login()));
+                    context, MaterialPageRoute(builder: (context) => const Login()));
                 Utils.showSnackBar("Berhasil Logout.", Colors.red);
               },
             ),

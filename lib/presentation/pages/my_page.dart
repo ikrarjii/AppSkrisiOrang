@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/presentation/pages/Check.dart';
 import 'package:flutter_application_1/presentation/pages/Izin.dart';
-import 'package:flutter_application_1/presentation/pages/Lembur.dart';
-import 'package:flutter_application_1/presentation/pages/Scan.dart';
-import 'package:flutter_application_1/presentation/pages/Tmbh_Izin.dart';
+
 import 'package:flutter_application_1/presentation/pages/check_lembur.dart';
 import 'package:flutter_application_1/presentation/pages/kasbon.dart';
-import 'package:flutter_application_1/presentation/pages/tmbh_Kasbon.dart';
+
 import 'data_presensi.dart';
-import 'home.dart';
-import 'login.dart';
-import 'regis.dart';
+
 import '../resources/warna.dart';
 
 class MyPages extends StatefulWidget {
@@ -23,10 +19,10 @@ class MyPages extends StatefulWidget {
 class MyPagesState extends State<MyPages> {
   int _selectedIndex = 0;
   final List<Widget> _widgetOptions = <Widget>[
-    DataPresensi(),
-    check_lemburPage(),
-    Kasbon(),
-    Izin()
+    const DataPresensi(),
+    const check_lemburPage(),
+    const Kasbon(),
+    const Izin()
   ];
 
   void _onItemTapped(int index) {
@@ -46,7 +42,7 @@ class MyPagesState extends State<MyPages> {
           );
         },
         backgroundColor: Warna.hijau2,
-        child: Icon(Icons.qr_code_scanner),
+        child: const Icon(Icons.qr_code_scanner),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       body: Center(
@@ -60,7 +56,7 @@ class MyPagesState extends State<MyPages> {
           color: Warna.putih,
           size: 24,
         ),
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(
               Icons.wysiwyg,

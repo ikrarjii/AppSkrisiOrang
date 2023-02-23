@@ -15,12 +15,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -28,7 +30,7 @@ class MyApp extends StatelessWidget {
         scaffoldMessengerKey: Utils.messengerKey,
         navigatorKey: navigatorKey,
         debugShowCheckedModeBanner: false,
-        localizationsDelegates: [
+        localizationsDelegates: const [
           GlobalWidgetsLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
           // MonthYearPickerLocalizations.delegate,
@@ -47,7 +49,7 @@ class MainPage extends StatelessWidget {
               if (snapshot.hasData) {
                 return const MyPages();
               } else {
-                return Login();
+                return const Login();
               } 
             }),
       );

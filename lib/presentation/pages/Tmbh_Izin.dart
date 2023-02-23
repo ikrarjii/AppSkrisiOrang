@@ -1,13 +1,12 @@
-import 'dart:io';
+// ignore_for_file: file_names, use_build_context_synchronously, sized_box_for_whitespace, avoid_print
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart' show FirebaseFirestore;
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Utils/Utils.dart';
-import 'package:flutter_application_1/main.dart';
-import 'package:flutter_application_1/presentation/pages/my_page.dart';
 import 'package:flutter_application_1/presentation/widgets/formcuxtom.dart';
 import 'package:image_picker/image_picker.dart';
 import '../resources/warna.dart';
@@ -21,7 +20,6 @@ class TambhIzin extends StatefulWidget {
 }
 
 class _TambhIzinState extends State<TambhIzin> {
-  int _counter = 0;
   String? dropDownValue;
   List<String> citylist = [
     'Izin',
@@ -91,7 +89,7 @@ class _TambhIzinState extends State<TambhIzin> {
 
       final imgTmp = File(image.path);
       setState(() => this.image = imgTmp);
-    } on PlatformException catch (e) {
+    } on PlatformException {
       print("failed pick image.");
     }
   }
@@ -102,7 +100,7 @@ class _TambhIzinState extends State<TambhIzin> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Center(
+      builder: (context) => const Center(
         child: CircularProgressIndicator(),
       ),
     );
@@ -166,7 +164,7 @@ class _TambhIzinState extends State<TambhIzin> {
       appBar: AppBar(
         // leading: Icon(Icons.abc),
         backgroundColor: Warna.hijau2,
-        actions: [
+        actions: const [
           SizedBox(
             height: 5,
           ),
@@ -180,23 +178,23 @@ class _TambhIzinState extends State<TambhIzin> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          margin: EdgeInsets.only(top: 20),
-          padding: EdgeInsets.symmetric(horizontal: 20),
+          margin: const EdgeInsets.only(top: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
               Container(
-                margin: EdgeInsets.symmetric(vertical: 10),
+                margin: const EdgeInsets.symmetric(vertical: 10),
                 child: Column(
                   children: [
                     Container(
                       width: double.infinity,
-                      child: Text(
+                      child: const Text(
                         "Izin",
                         textAlign: TextAlign.left,
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(vertical: 5),
+                      padding: const EdgeInsets.symmetric(vertical: 5),
                       child: Column(
                         children: <Widget>[
                           DropdownButtonFormField(
@@ -232,22 +230,22 @@ class _TambhIzinState extends State<TambhIzin> {
                         ],
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 2,
                     ),
                     Container(
-                      margin: EdgeInsets.symmetric(vertical: 10),
+                      margin: const EdgeInsets.symmetric(vertical: 10),
                       child: Column(
                         children: [
                           Container(
                             width: double.infinity,
-                            child: Text(
+                            child: const Text(
                               "Mulai Tanggal Izin",
                               textAlign: TextAlign.left,
                             ),
                           ),
                           FormCustom(
-                            suffixicon: Icon(Icons.date_range),
+                            suffixicon: const Icon(Icons.date_range),
                             text: 'Mulai Tanggal Izin',
                             readOnly: true,
                             onTap: () {
@@ -260,22 +258,22 @@ class _TambhIzinState extends State<TambhIzin> {
                         ],
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 2,
                     ),
                     Container(
-                      margin: EdgeInsets.symmetric(vertical: 10),
+                      margin: const EdgeInsets.symmetric(vertical: 10),
                       child: Column(
                         children: [
                           Container(
                             width: double.infinity,
-                            child: Text(
+                            child: const Text(
                               "Sampai Tanggal Izin",
                               textAlign: TextAlign.left,
                             ),
                           ),
                           FormCustom(
-                            suffixicon: Icon(Icons.date_range),
+                            suffixicon: const Icon(Icons.date_range),
                             text: 'Sampai Tanggal Izin',
                             readOnly: true,
                             onTap: () {
@@ -288,16 +286,16 @@ class _TambhIzinState extends State<TambhIzin> {
                         ],
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 2,
                     ),
                     Container(
-                      margin: EdgeInsets.symmetric(vertical: 10),
+                      margin: const EdgeInsets.symmetric(vertical: 10),
                       child: Column(
                         children: [
                           Container(
                             width: double.infinity,
-                            child: Text(
+                            child: const Text(
                               "Keterangan",
                               textAlign: TextAlign.left,
                             ),
@@ -309,16 +307,16 @@ class _TambhIzinState extends State<TambhIzin> {
                         ],
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 2,
                     ),
                     Container(
-                      margin: EdgeInsets.symmetric(vertical: 10),
+                      margin: const EdgeInsets.symmetric(vertical: 10),
                       child: Column(
                         children: [
                           Container(
                             width: double.infinity,
-                            child: Text(
+                            child: const Text(
                               "Foto",
                               textAlign: TextAlign.left,
                             ),
@@ -337,7 +335,7 @@ class _TambhIzinState extends State<TambhIzin> {
                               : Container(
                                   alignment: Alignment.topLeft,
                                   child: IconButton(
-                                      icon: Icon(Icons.add_a_photo),
+                                      icon: const Icon(Icons.add_a_photo),
                                       iconSize: 50,
                                       color: Warna.abuabu,
                                       onPressed: () {
@@ -350,19 +348,19 @@ class _TambhIzinState extends State<TambhIzin> {
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 2,
               ),
               Container(
-                margin: EdgeInsets.symmetric(vertical: 5),
+                margin: const EdgeInsets.symmetric(vertical: 5),
                 width: double.infinity,
-                padding: EdgeInsets.all(3),
+                padding: const EdgeInsets.all(3),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    primary: Warna.hijau2,
-                    padding: EdgeInsets.symmetric(vertical: 20),
+                    backgroundColor: Warna.hijau2,
+                    padding: const EdgeInsets.symmetric(vertical: 20),
                   ),
-                  child: Text("Kirim"),
+                  child: const Text("Kirim"),
                   onPressed: () {
                     sendData();
                   },

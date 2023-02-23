@@ -1,8 +1,7 @@
-import 'dart:io';
+// ignore_for_file: sized_box_for_whitespace, use_build_context_synchronously, file_names
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Utils/Utils.dart';
 import 'package:flutter_application_1/presentation/widgets/formcuxtom.dart';
@@ -53,7 +52,7 @@ class _TambhKasbonState extends State<TambhKasbon> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Center(
+      builder: (context) => const Center(
         child: CircularProgressIndicator(),
       ),
     );
@@ -107,9 +106,9 @@ class _TambhKasbonState extends State<TambhKasbon> {
         backgroundColor: Warna.hijau2,
         actions: [
           Container(
-            margin: EdgeInsets.only(right: 45),
+            margin: const EdgeInsets.only(right: 45),
           ),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
         ],
@@ -121,17 +120,17 @@ class _TambhKasbonState extends State<TambhKasbon> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          margin: EdgeInsets.only(top: 20),
-          padding: EdgeInsets.symmetric(horizontal: 20),
+          margin: const EdgeInsets.only(top: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
               Container(
-                margin: EdgeInsets.symmetric(vertical: 10),
+                margin: const EdgeInsets.symmetric(vertical: 10),
                 child: Column(
                   children: [
                     Container(
                       width: double.infinity,
-                      child: Text(
+                      child: const Text(
                         "Jumlah",
                         textAlign: TextAlign.left,
                       ),
@@ -143,22 +142,22 @@ class _TambhKasbonState extends State<TambhKasbon> {
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 5,
               ),
               Container(
-                margin: EdgeInsets.symmetric(vertical: 10),
+                margin: const EdgeInsets.symmetric(vertical: 10),
                 child: Column(
                   children: [
                     Container(
                       width: double.infinity,
-                      child: Text(
+                      child: const Text(
                         "Tanggal",
                         textAlign: TextAlign.left,
                       ),
                     ),
                     FormCustom(
-                      suffixicon: Icon(Icons.date_range),
+                      suffixicon: const Icon(Icons.date_range),
                       text: 'Tanggal Kasbon',
                       readOnly: true,
                       onTap: () {
@@ -171,16 +170,16 @@ class _TambhKasbonState extends State<TambhKasbon> {
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 5,
               ),
               Container(
-                margin: EdgeInsets.symmetric(vertical: 10),
+                margin: const EdgeInsets.symmetric(vertical: 10),
                 child: Column(
                   children: [
                     Container(
                       width: double.infinity,
-                      child: Text(
+                      child: const Text(
                         "Keterangan",
                         textAlign: TextAlign.left,
                       ),
@@ -192,19 +191,19 @@ class _TambhKasbonState extends State<TambhKasbon> {
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 30,
               ),
               Container(
-                margin: EdgeInsets.symmetric(vertical: 10),
+                margin: const EdgeInsets.symmetric(vertical: 10),
                 width: double.infinity,
-                padding: EdgeInsets.all(3),
+                padding: const EdgeInsets.all(3),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    primary: Warna.hijau2,
-                    padding: EdgeInsets.symmetric(vertical: 20),
+                    backgroundColor: Warna.hijau2,
+                    padding: const EdgeInsets.symmetric(vertical: 20),
                   ),
-                  child: Text("Kirim"),
+                  child: const Text("Kirim"),
                   onPressed: () {
                     sendData();
                   },

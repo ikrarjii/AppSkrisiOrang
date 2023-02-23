@@ -1,17 +1,14 @@
-import 'dart:developer';
+// ignore_for_file: file_names, non_constant_identifier_names, unused_local_variable, no_leading_underscores_for_local_identifiers, avoid_unnecessary_containers, sized_box_for_whitespace, prefer_is_empty
 
+import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Utils/Utils.dart';
-import 'package:flutter_application_1/presentation/pages/Lembur.dart';
-import 'package:flutter_application_1/presentation/pages/Scan.dart';
-import 'package:flutter_application_1/presentation/pages/data_presensi.dart';
 import 'package:flutter_application_1/presentation/pages/my_page.dart';
 import 'package:flutter_application_1/presentation/resources/warna.dart';
 import 'package:flutter_application_1/presentation/widgets/attendance_card.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+
 import '../resources/gambar.dart';
 import 'package:qrscan/qrscan.dart' as scanner;
 import 'package:intl/intl.dart';
@@ -25,7 +22,6 @@ class CheckPage extends StatefulWidget {
 
 class _CheckPageState extends State<CheckPage> {
   Future<void> scanQR() async {
-    String barcodeScanRes;
 
     FirebaseAuth auth = FirebaseAuth.instance;
     String uid = auth.currentUser!.uid;
@@ -33,7 +29,7 @@ class _CheckPageState extends State<CheckPage> {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     CollectionReference<Map<String, dynamic>> cPresent =
-        await firestore.collection("users").doc(uid).collection("present");
+        firestore.collection("users").doc(uid).collection("present");
 
     DocumentSnapshot<Map<String, dynamic>> Gaji =
         await firestore.collection("users").doc(uid).get();
@@ -46,16 +42,16 @@ class _CheckPageState extends State<CheckPage> {
     String todayDocID = DateFormat().add_yMd().format(now).replaceAll("/", "-");
 
     int lembur = 50000;
+    String masuk = "";
+    String keluar = "";
     // Utils.showSnackBar("Maaf, Waktu Absen Telah Habis.", Colors.green);
     // if (now.hour >= 8 && now.hour <= 4) {
 
-    if (snapPrensent.docs.length == 0) {
-      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-          '#ff6666', 'Cancel', true, ScanMode.QR);
+    if (snapPrensent.docs.isEmpty) {
       await scanner.scan();
 
       if (now.hour >= 9 && now.hour <= 10) {
-        print(now);
+     
         log("terlambat");
         await cPresent.doc(todayDocID).set({
           "date": now.toIso8601String(),
@@ -66,6 +62,8 @@ class _CheckPageState extends State<CheckPage> {
             // "user": user!.email,
           }
         });
+
+        masuk = now.toIso8601String();
       } else {
         log("terlambat");
         log("tidak terlambat");
@@ -78,6 +76,7 @@ class _CheckPageState extends State<CheckPage> {
             // "user": user!.email,
           }
         });
+        masuk = now.toIso8601String();
       }
     } else {
       DocumentSnapshot<Map<String, dynamic>> absenn =
@@ -91,8 +90,6 @@ class _CheckPageState extends State<CheckPage> {
               "Sukses Sudah Absen Masuk && Keluar.", Colors.green);
         } else {
           //absen Keluar
-          barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-              '#ff6666', 'Cancel', true, ScanMode.QR);
           await scanner.scan();
           int gajiDay = 0;
           final _gajiDay = gajiDay + 150000;
@@ -103,11 +100,10 @@ class _CheckPageState extends State<CheckPage> {
               "date": now.toIso8601String(),
             }
           });
+          keluar = now.toIso8601String();
         }
       } else {
         //masuk
-        barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-            '#ff6666', 'Cancel', true, ScanMode.QR);
         await scanner.scan();
         await cPresent.doc(todayDocID).set({
           "date": now.toIso8601String(),
@@ -115,6 +111,7 @@ class _CheckPageState extends State<CheckPage> {
             "date": now.toIso8601String(),
           }
         });
+        masuk = now.toIso8601String();
       }
     }
 
@@ -160,6 +157,7 @@ class _CheckPageState extends State<CheckPage> {
                     child: StreamBuilder(
                         stream: streamUser(),
                         builder: (context, snap) {
+                          log('$snap');
                           return Stack(
                             children: [
                               Container(
@@ -176,9 +174,9 @@ class _CheckPageState extends State<CheckPage> {
                                 child: Container(),
                               ),
                               Container(
-                                margin: EdgeInsets.symmetric(vertical: 20),
+                                margin: const EdgeInsets.symmetric(vertical: 20),
                                 width: double.infinity,
-                                padding: EdgeInsets.only(),
+                                padding: const EdgeInsets.only(),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
@@ -188,19 +186,19 @@ class _CheckPageState extends State<CheckPage> {
                                             MainAxisAlignment.start,
                                         children: [
                                           IconButton(
-                                              icon: Icon(Icons.arrow_back),
+                                              icon: const Icon(Icons.arrow_back),
                                               color: Warna.putih,
                                               onPressed: () {
                                                 Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
                                                         builder: (context) =>
-                                                            MyPages()));
+                                                            const MyPages()));
                                               }),
                                         ],
                                       ),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 20,
                                     ),
                                     Title(
@@ -214,7 +212,7 @@ class _CheckPageState extends State<CheckPage> {
                                         ),
                                       ),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 10,
                                     ),
                                     Title(
@@ -232,20 +230,20 @@ class _CheckPageState extends State<CheckPage> {
                                   ],
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 2,
                               ),
                               Container(
-                                  margin: EdgeInsets.only(top: 180, bottom: 10),
+                                  margin: const EdgeInsets.only(top: 180, bottom: 10),
                                   width: double.infinity,
-                                  padding: EdgeInsets.all(25),
+                                  padding: const EdgeInsets.all(25),
                                   child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                      primary: Warna.kuning,
+                                      backgroundColor: Warna.kuning,
                                       padding:
-                                          EdgeInsets.symmetric(vertical: 20),
+                                          const EdgeInsets.symmetric(vertical: 20),
                                     ),
-                                    child: Text("Check In"),
+                                    child: const Text("Check In"),
                                     onPressed: () {
                                       scanQR();
                                       // Navigator.push(context,
@@ -260,7 +258,7 @@ class _CheckPageState extends State<CheckPage> {
 
                         ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
 
@@ -296,13 +294,13 @@ class _CheckPageState extends State<CheckPage> {
 
                           return AttendanceCard(
                             date:
-                                "${DateFormat.yMMMEd().format(DateTime.parse(data['date'].toString()))}",
+                                DateFormat.yMMMEd().format(DateTime.parse(data['date'].toString())),
                             checkIn: data['masuk']?['date'] == null
                                 ? "-"
-                                : "${DateFormat.jms().format(DateTime.parse(data['masuk']['date'].toString()))}",
+                                : DateFormat.jms().format(DateTime.parse(data['masuk']['date'].toString())),
                             checkout: data['keluar']?['date'] == null
                                 ? "-"
-                                : "${DateFormat.jms().format(DateTime.parse(data['keluar']['date'].toString()))}",
+                                : DateFormat.jms().format(DateTime.parse(data['keluar']['date'].toString())),
                           );
 
                           //btasss

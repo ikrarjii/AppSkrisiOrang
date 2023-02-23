@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_unnecessary_containers
+
 import 'package:flutter/material.dart';
 import '../resources/warna.dart';
 
@@ -21,7 +23,7 @@ class _BerhasilState extends State<Berhasil> {
               color: Warna.hijau2,
               size: 50.0,
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Text(
@@ -32,18 +34,18 @@ class _BerhasilState extends State<Berhasil> {
                 color: Warna.htam,
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 300,
             ),
             Container(
               width: double.infinity,
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  primary: Warna.daftar,
-                  padding: EdgeInsets.symmetric(vertical: 20),
+                  backgroundColor: Warna.daftar,
+                  padding: const EdgeInsets.symmetric(vertical: 20),
                 ),
-                child: Text("Masuk"),
+                child: const Text("Masuk"),
                 onPressed: () {},
               ),
             ),

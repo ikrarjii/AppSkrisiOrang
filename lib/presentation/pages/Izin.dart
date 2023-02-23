@@ -1,3 +1,5 @@
+// ignore_for_file: file_names, sort_child_properties_last, non_constant_identifier_names, unnecessary_brace_in_string_interps
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -69,7 +71,7 @@ class _IzinState extends State<Izin> {
         child: Column(
           children: [
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

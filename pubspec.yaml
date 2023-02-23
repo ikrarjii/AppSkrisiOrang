@@ -45,6 +45,7 @@ dependencies:
   qrscan: ^0.3.3
   # month_year_picker: ^0.2.0+2
   equatable: ^2.0.3
+  get: ^4.6.5
   
 
 dev_dependencies:

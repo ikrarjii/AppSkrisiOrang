@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_null_in_if_null_operators
+
 import 'package:flutter/material.dart';
 import '../resources/warna.dart';
 
@@ -25,10 +27,10 @@ class FormCustom extends StatelessWidget {
         child: TextField(
           controller: controller,
           onTap: onTap,
-          readOnly: this.readOnly ?? false,
+          readOnly: readOnly ?? false,
           decoration: InputDecoration(
-              prefixIcon: null ?? this.prefixicon,
-              suffixIcon: null ?? this.suffixicon,
+              prefixIcon: null ?? prefixicon,
+              suffixIcon: null ?? suffixicon,
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
                   color: Warna.hijau2,
@@ -41,8 +43,8 @@ class FormCustom extends StatelessWidget {
                   width: 1.0,
                 ),
               ),
-              hintText: this.text,
-              hintStyle: TextStyle(color: Color.fromRGBO(158, 163, 155, 0.5))),
+              hintText: text,
+              hintStyle: const TextStyle(color: Color.fromRGBO(158, 163, 155, 0.5))),
           style: TextStyle(color: Warna.htam),
         ));
   }

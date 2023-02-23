@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_unnecessary_containers, sized_box_for_whitespace, sort_child_properties_last, use_build_context_synchronously, unused_local_variable
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +29,7 @@ class _LoginState extends State<Login> {
           child: Column(
             children: [
               Container(
-                margin: EdgeInsets.only(top: 30),
+                margin: const EdgeInsets.only(top: 30),
                 width: double.infinity,
                 height: 100,
                 child: Image.asset("assets/logo.png"),
@@ -72,7 +74,7 @@ class _LoginState extends State<Login> {
                 height: 20,
               ),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   children: [
                     Container(
@@ -97,22 +99,22 @@ class _LoginState extends State<Login> {
               ),
               Container(
                 width: double.infinity,
-                padding: EdgeInsets.symmetric(horizontal: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   child: const Text("Lupa Password ?"),
-                  style: TextButton.styleFrom(primary: Warna.borderside),
+                  style: TextButton.styleFrom(foregroundColor: Warna.borderside),
                   onPressed: () {},
                 ),
               ),
               const SizedBox(height: 20),
               Container(
                 width: double.infinity,
-                padding: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    primary: Warna.hijau2,
-                    padding: EdgeInsets.symmetric(vertical: 20),
+                    backgroundColor: Warna.hijau2,
+                    padding: const EdgeInsets.symmetric(vertical: 20),
                   ),
                   child: const Text("Masuk"),
                   onPressed: () {
@@ -123,7 +125,7 @@ class _LoginState extends State<Login> {
               const SizedBox(height: 20),
               Container(
                 width: double.infinity,
-                padding: EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -166,7 +168,7 @@ class _LoginState extends State<Login> {
         .where("email", isEqualTo: emailController.text.trim())
         .get();
 
-    if (user.docs.length > 0) {
+    if (user.docs.isNotEmpty) {
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -177,9 +179,9 @@ class _LoginState extends State<Login> {
 
       String? e = user.docs[0]["email"];
       String? id = user.docs[0]["device_id"];
-      String? device_id = await PlatformDeviceId.getDeviceId;
+      String? deviceId = await PlatformDeviceId.getDeviceId;
 
-      if (id != device_id) {
+      if (id != deviceId) {
         Navigator.of(context, rootNavigator: true).pop('dialog');
         Utils.showSnackBar(
             "Device yang digunakan untuk login tidak sama dengan device untuk register.",

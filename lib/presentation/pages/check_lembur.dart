@@ -1,3 +1,5 @@
+// ignore_for_file: camel_case_types, unused_local_variable, prefer_is_empty
+
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Utils/Utils.dart';
 import 'package:flutter_application_1/presentation/pages/my_page.dart';
 import 'package:flutter_application_1/presentation/resources/warna.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import '../resources/gambar.dart';
 import 'package:qrscan/qrscan.dart' as scanner;
 import 'package:intl/intl.dart';
@@ -20,7 +21,6 @@ class check_lemburPage extends StatefulWidget {
 
 class _check_lemburPageState extends State<check_lemburPage> {
   Future<void> scanQR() async {
-    String barcodeScanRes;
     int lembur = 0;
 
     FirebaseAuth auth = FirebaseAuth.instance;
@@ -29,7 +29,7 @@ class _check_lemburPageState extends State<check_lemburPage> {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     CollectionReference<Map<String, dynamic>> cPresent =
-        await firestore.collection("users").doc(uid).collection("present");
+        firestore.collection("users").doc(uid).collection("present");
 
     QuerySnapshot<Map<String, dynamic>> snapPrensent = await cPresent.get();
     DateTime now = DateTime.now();
@@ -49,8 +49,6 @@ class _check_lemburPageState extends State<check_lemburPage> {
           dataPresentTod?["starLembur"] != null) {
         Utils.showSnackBar("Sukses Sudah Absen Masuk && Keluar.", Colors.green);
       } else if (dataPresentTod?["starLembur"] == null) {
-        barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-            '#ff6666', 'Cancel', true, ScanMode.QR);
         await scanner.scan();
         await cPresent.doc(todayDocID).update({
           "starLembur": {
@@ -58,8 +56,6 @@ class _check_lemburPageState extends State<check_lemburPage> {
           }
         });
       } else {
-        barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-            '#ff6666', 'Cancel', true, ScanMode.QR);
         await scanner.scan();
         await cPresent.doc(todayDocID).update({
           "OutLembur": {
@@ -71,17 +67,22 @@ class _check_lemburPageState extends State<check_lemburPage> {
       Utils.showSnackBar("Maaf Anda Belum Bisa Absen Lembur.", Colors.green);
     }
 
-    var jamMulai = DateTime.parse(dataPresentTod!["starLembur"]["jamSLembur"]);
+    if (dataPresentTod?["OutLembur"] != null &&
+        dataPresentTod?["starLembur"] != null) {
+      DateTime jamMulai =
+          DateTime.parse(dataPresentTod!["starLembur"]["jamSLembur"]);
 
-    var jamAkhir = DateTime.parse(dataPresentTod["OutLembur"]["JamOLembur"]);
+      DateTime jamAkhir =
+          DateTime.parse(dataPresentTod["OutLembur"]["JamOLembur"]);
 
-    var jamLembur = jamAkhir.difference(jamMulai).inHours.round();
+      var jamLembur = jamAkhir.difference(jamMulai).inHours.round();
 
-    lembur = jamLembur;
+      lembur = jamLembur;
 
-    await cPresent.doc(todayDocID).update({
-      "waktuLembur": lembur,
-    });
+      await cPresent.doc(todayDocID).update({
+        "waktuLembur": lembur,
+      });
+    }
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> streamUser() async* {
@@ -111,110 +112,103 @@ class _check_lemburPageState extends State<check_lemburPage> {
               // scrollDirection: Axis.vertical,
               child: Column(
                 children: [
-                  Container(
-                    child: StreamBuilder(
-                        stream: streamUser(),
-                        builder: (context, snap) {
-                          return Stack(
-                            children: [
-                              Container(
-                                  child: Image.asset(
-                                Gambar.lmbur,
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.4,
-                              )),
-                              Container(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.4,
-                                child: Container(),
-                              ),
-                              Container(
-                                margin: EdgeInsets.symmetric(vertical: 20),
-                                width: double.infinity,
-                                padding: const EdgeInsets.only(),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Container(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          IconButton(
-                                              icon: Icon(Icons.arrow_back),
-                                              color: Warna.putih,
-                                              onPressed: () {
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            MyPages()));
-                                              }),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 20,
-                                    ),
-                                    Title(
-                                      color: Warna.putih,
-                                      child: Text(
-                                        (DateFormat('KK:mm')
-                                            .format(DateTime.now())),
-                                        style: TextStyle(
+                  StreamBuilder(
+                      stream: streamUser(),
+                      builder: (context, snap) {
+                        return Stack(
+                          children: [
+                            Image.asset(
+                              Gambar.lmbur,
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: MediaQuery.of(context).size.height * 0.4,
+                            ),
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.4,
+                              child: Container(),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.symmetric(vertical: 20),
+                              width: double.infinity,
+                              padding: const EdgeInsets.only(),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      IconButton(
+                                          icon: const Icon(Icons.arrow_back),
                                           color: Warna.putih,
-                                          fontSize: 32,
-                                        ),
+                                          onPressed: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const MyPages()));
+                                          }),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Title(
+                                    color: Warna.putih,
+                                    child: Text(
+                                      (DateFormat('KK:mm')
+                                          .format(DateTime.now())),
+                                      style: TextStyle(
+                                        color: Warna.putih,
+                                        fontSize: 32,
                                       ),
                                     ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    Title(
-                                      color: Warna.hijau2,
-                                      child: Text(
-                                        (DateFormat('dd MMMM yyyy')
-                                            .format(DateTime.now())),
-                                        style: TextStyle(
-                                          color: Warna.putih,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Title(
+                                    color: Warna.hijau2,
+                                    child: Text(
+                                      (DateFormat('dd MMMM yyyy')
+                                          .format(DateTime.now())),
+                                      style: TextStyle(
+                                        color: Warna.putih,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(
-                                height: 2,
-                              ),
-                              Container(
-                                  margin: EdgeInsets.only(top: 180, bottom: 10),
-                                  width: double.infinity,
-                                  padding: EdgeInsets.all(25),
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      primary: Warna.kuning,
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 20),
-                                    ),
-                                    child: const Text("Check In"),
-                                    onPressed: () async {
-                                      await scanQR();
-                                      // Navigator.push(context,
-                                      //     MaterialPageRoute(builder: (context) => Csan()));
-                                    },
-                                  ))
-                            ],
-                          );
-                        }
+                            ),
+                            const SizedBox(
+                              height: 2,
+                            ),
+                            Container(
+                                margin:
+                                    const EdgeInsets.only(top: 180, bottom: 10),
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(25),
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Warna.kuning,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 20),
+                                  ),
+                                  child: const Text("Check In"),
+                                  onPressed: () async {
+                                    await scanQR();
+                                    // Navigator.push(context,
+                                    //     MaterialPageRoute(builder: (context) => Csan()));
+                                  },
+                                ))
+                          ],
+                        );
+                      }
 
-                        // batass
+                      // batass
 
-                        ),
-                  ),
+                      ),
                   const SizedBox(
                     height: 10,
                   ),
@@ -224,9 +218,9 @@ class _check_lemburPageState extends State<check_lemburPage> {
                     builder: ((context, snapPresent) {
                       if (snapPresence.data?.docs.length == 0 ||
                           snapPresence.data == null) {
-                        return SizedBox(
+                        return const SizedBox(
                           height: 400,
-                          child: const Center(
+                          child: Center(
                             child:
                                 Text("Maaf, History absen anda belum ada!!!"),
                           ),
@@ -236,7 +230,7 @@ class _check_lemburPageState extends State<check_lemburPage> {
                       return ListView.builder(
                         shrinkWrap: true,
                         scrollDirection: Axis.vertical,
-                        physics: NeverScrollableScrollPhysics(),
+                        physics: const NeverScrollableScrollPhysics(),
                         itemCount: snapPresence.data!.docs.length,
                         itemBuilder: (context, index) {
                           Map<String, dynamic> data =
@@ -275,7 +269,8 @@ class _check_lemburPageState extends State<check_lemburPage> {
                                       size: 20.0,
                                     ),
                                     Text(
-                                      "${DateFormat.yMMMEd().format(DateTime.parse(data['date'].toString()))}",
+                                      DateFormat.yMMMEd().format(DateTime.parse(
+                                          data['date'].toString())),
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
@@ -284,7 +279,7 @@ class _check_lemburPageState extends State<check_lemburPage> {
                                     ),
                                   ],
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 15,
                                 ),
                                 Row(children: [
@@ -296,13 +291,15 @@ class _check_lemburPageState extends State<check_lemburPage> {
                                       color: Warna.htam,
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     width: 38,
                                   ),
                                   Text(
                                     data['masuk']?['date'] == null
                                         ? "-"
-                                        : "${DateFormat.jms().format(DateTime.parse(data['masuk']['date'].toString()))}",
+                                        : DateFormat.jms().format(
+                                            DateTime.parse(data['masuk']['date']
+                                                .toString())),
                                     // data["check_out"] != ""
                                     //     ? DateFormat("HH mm")
                                     //         .format(data["date"].toDate())
@@ -314,7 +311,7 @@ class _check_lemburPageState extends State<check_lemburPage> {
                                     ),
                                   ),
                                 ]),
-                                SizedBox(
+                                const SizedBox(
                                   height: 7,
                                 ),
                                 Row(
@@ -327,13 +324,16 @@ class _check_lemburPageState extends State<check_lemburPage> {
                                         color: Warna.htam,
                                       ),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       width: 30,
                                     ),
                                     Text(
                                       data['keluar']?['date'] == null
                                           ? "-"
-                                          : "${DateFormat.jms().format(DateTime.parse(data['keluar']['date'].toString()))}",
+                                          : DateFormat.jms().format(
+                                              DateTime.parse(data['keluar']
+                                                      ['date']
+                                                  .toString())),
                                       // data["check_out"] != ""
                                       //     ? DateFormat("HH mm")
                                       //         .format(data["date"].toDate())

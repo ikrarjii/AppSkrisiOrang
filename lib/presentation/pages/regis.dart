@@ -29,11 +29,11 @@ class RegisState extends State<Regis> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
               Container(
-                margin: EdgeInsets.only(top: 35),
+                margin: const EdgeInsets.only(top: 35),
                 width: double.infinity,
                 child: Text(
                   "Registrasi",
@@ -41,7 +41,7 @@ class RegisState extends State<Regis> {
                   style: TextStyle(fontSize: 24, color: Warna.abuTr),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 8,
               ),
               FormCustom(
@@ -65,28 +65,28 @@ class RegisState extends State<Regis> {
                 text: "Password",
                 controller: passworController,
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               Container(
-                margin: EdgeInsets.symmetric(vertical: 10),
+                margin: const EdgeInsets.symmetric(vertical: 10),
                 width: double.infinity,
-                padding: EdgeInsets.all(3),
+                padding: const EdgeInsets.all(3),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    primary: Warna.hijau2,
-                    padding: EdgeInsets.symmetric(vertical: 20),
+                    backgroundColor: Warna.hijau2,
+                    padding: const EdgeInsets.symmetric(vertical: 20),
                   ),
-                  child: Text("Daftar"),
+                  child: const Text("Daftar"),
                   onPressed: () {
                     signUp();
                   },
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Container(
                 width: double.infinity,
-                padding: EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -129,7 +129,7 @@ class RegisState extends State<Regis> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Center(
+      builder: (context) => const Center(
         child: CircularProgressIndicator(),
       ),
     );

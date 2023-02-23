@@ -1,7 +1,4 @@
-import 'dart:developer';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_application_1/presentation/resources/warna.dart';
@@ -11,7 +8,7 @@ class AttendanceCard extends StatelessWidget {
   final String checkIn;
   final String checkout;
 
-  AttendanceCard(
+  const AttendanceCard(
       {super.key,
       required this.date,
       required this.checkIn,
@@ -19,9 +16,6 @@ class AttendanceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    FirebaseAuth auth = FirebaseAuth.instance;
-    var uid = auth.currentUser!.uid;
 
     return Container(
       alignment: Alignment.centerLeft,
