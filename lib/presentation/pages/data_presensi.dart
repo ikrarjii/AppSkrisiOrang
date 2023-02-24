@@ -1,19 +1,25 @@
-// ignore_for_file: unused_local_variable, avoid_print
 import 'dart:developer';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
 import 'package:flutter_application_1/presentation/pages/home.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_application_1/Utils/Utils.dart';
 // import 'package:month_picker_dialog/month_picker_dialog.dart';
+
 import '../resources/warna.dart';
 import '../widgets/ItemPresensi.dart';
+import 'package:image_picker/image_picker.dart';
 
 // import 'package:month_year_picker/month_year_picker.dart';
 
 class DataPresensi extends StatefulWidget {
-  const DataPresensi({Key? key}) : super(key: key);
+  DataPresensi({Key? key}) : super(key: key);
 
   @override
   State<DataPresensi> createState() => _DataPresensiState();
@@ -34,16 +40,22 @@ class _DataPresensiState extends State<DataPresensi> {
 
   Future<void> _selectPeriod(BuildContext context) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final user = FirebaseAuth.instance.currentUser;
     FirebaseAuth auth = FirebaseAuth.instance;
     String uid = auth.currentUser!.uid;
 
-    QuerySnapshot<Map<String, dynamic>> object =
-        await firestore.collection("users").get();
+    QuerySnapshot<Map<String, dynamic>> object = await firestore
+        .collection("users")
+        .doc(uid)
+        .collection('present')
+        .get();
 
     log("okokk = $object");
 
     List<Map<String, dynamic>> objectList =
         object.docs.map((e) => e.data()).toList();
+
+    log("List nya = $objectList");
 
     final selected = await showDatePicker(
             context: context,
@@ -77,7 +89,9 @@ class _DataPresensiState extends State<DataPresensi> {
           gaji['nama'] = "";
 
           for (var e in absen) {
-            gaji['gaji'] = gaji['gaji'] + e['gajiDay'];
+            if (e['gajiDay'] != null) {
+              gaji['gaji'] = gaji['gaji'] + e['gajiDay'];
+            }
             gaji['lembur'] = gaji['lembur'] + e['waktuLembur'];
             gaji['keterlambatan'] = gaji['keterlambatan'] + e['late'];
             gaji['nama'] = e['nama'];
@@ -85,7 +99,52 @@ class _DataPresensiState extends State<DataPresensi> {
         });
       }
     });
-    return selected;
+  }
+
+  Future pikcImage() async {
+    try {
+      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (image == null) return;
+
+      final imgTmp = File(image.path);
+      setState(() => this.image = imgTmp);
+    } on PlatformException catch (e) {
+      print("failed pick image.");
+    }
+  }
+
+  Future sendData() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    try {
+      final docUser = await FirebaseFirestore.instance
+          .collection("users")
+          .where("email", isEqualTo: user!.email)
+          .get();
+
+      String nama = docUser.docs[0]["nama"];
+
+      var snapshot = await FirebaseStorage.instance
+          .ref()
+          .child("images")
+          .child('${DateTime.now()}-bukti.jpg')
+          .putFile(image!);
+      var downloadUrl = await snapshot.ref.getDownloadURL();
+
+      Navigator.of(context, rootNavigator: true).pop('dialog');
+      // navigatorKey.currentState!.pop();
+    } on FirebaseAuthException catch (e) {
+      Navigator.of(context, rootNavigator: true).pop('dialog');
+      Utils.showSnackBar(e.message, Colors.red);
+    }
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> streamUser() async* {
@@ -99,7 +158,7 @@ class _DataPresensiState extends State<DataPresensi> {
         .collection("present");
 
     collectionReference.orderBy("date").get().then((QuerySnapshot snapshot) {
-      for (var document in snapshot.docs) {}
+      snapshot.docs.forEach((DocumentSnapshot document) {});
     });
   }
 
@@ -129,25 +188,24 @@ class _DataPresensiState extends State<DataPresensi> {
                       shrinkWrap: true,
                       scrollDirection: Axis.vertical,
                       itemCount: 1,
-                      // snapPresence.data!.docs.length,
                       itemBuilder: (context, index) {
                         Map<String, dynamic> data =
                             snapPresence.data!.docs[index].data();
-                        return SizedBox(
+
+                        return Container(
                           width: double.infinity,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SizedBox(
+                              SizedBox(
                                 height: 250,
                                 child: home(),
                               ),
                               Container(
                                 // margin: EdgeInsets.only(top: 10),
                                 // margin: EdgeInsets.symmetric(horizontal: 30),
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 20),
+                                padding: EdgeInsets.symmetric(horizontal: 20),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -160,8 +218,7 @@ class _DataPresensiState extends State<DataPresensi> {
                                           fontWeight: FontWeight.bold),
                                     ),
                                     IconButton(
-                                        icon: const Icon(
-                                            Icons.keyboard_arrow_down),
+                                        icon: Icon(Icons.keyboard_arrow_down),
                                         color: Warna.hijau2,
                                         onPressed: () {
                                           _selectPeriod(context);
@@ -205,7 +262,7 @@ class _DataPresensiState extends State<DataPresensi> {
 
             //okok
           } else {
-            return const Expanded(
+            return Expanded(
                 child: Center(
               child: CircularProgressIndicator(),
             ));

@@ -61,7 +61,6 @@ class _homeState extends State<home> {
 
       // Perbarui status widget dengan gambar yang dipilih
       setState(() => this.image = imgTmp);
-      log('${image.path}');
     } on PlatformException {
       print("failed pick image.");
     }
